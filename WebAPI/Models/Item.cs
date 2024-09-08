@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebAPI.Models
 {
@@ -30,6 +31,7 @@ namespace WebAPI.Models
         public Guid UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
+        [JsonIgnore] // Prevent circular reference when serializing
         public virtual User User { get; set; }
 
         [Required]

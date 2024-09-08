@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebAPI.Models
 {
@@ -17,6 +18,7 @@ namespace WebAPI.Models
 
         public DateTime? UpdateDate { get; set; } // Nullable
 
+        [JsonIgnore] // Prevent circular reference when serializing
         public virtual ICollection<User> Users { get; set; } = new List<User>();
     }
 }

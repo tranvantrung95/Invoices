@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebAPI.Models
 {
@@ -26,6 +27,7 @@ namespace WebAPI.Models
         public Guid RoleId { get; set; }
 
         [ForeignKey(nameof(RoleId))]
+        [JsonIgnore] // Prevent circular reference when serializing
         public virtual Role Role { get; set; }
 
         [Required]

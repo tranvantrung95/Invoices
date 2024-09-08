@@ -12,8 +12,8 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(InvoicikaDbContext))]
-    [Migration("20240907140426_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240908154921_Seeder")]
+    partial class Seeder
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
