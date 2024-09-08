@@ -1,0 +1,19 @@
+
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="8">
+      <nz-card nzTitle="Monthly Income" style="text-align:center;">
+        <nz-statistic [nzValue]="sales" [nzPrefix]="'$'" [nzValueStyle]="{ color: '#3f8600' }"></nz-statistic>
+      </nz-card>
+    </div>
+    <div nz-col [nzSpan]="8">
+      <nz-card nzTitle="Monthly Invoices" style="text-align:center;">
+        <nz-statistic [nzValue]="newOrders" [nzValueStyle]="{ color: '#cf1322' }"></nz-statistic>
+      </nz-card>
+    </div>
+    <div nz-col [nzSpan]="8">
+      <nz-card nzTitle="Monthly Customers" style="text-align:center;">
+        <nz-statistic [nzValue]="activeUsers" [nzValueStyle]="{ color: 'blue' }"></nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
