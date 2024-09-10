@@ -14,7 +14,7 @@ namespace WebAPI.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<VAT> Vats { get; set; }
+        public DbSet<VAT> VATs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

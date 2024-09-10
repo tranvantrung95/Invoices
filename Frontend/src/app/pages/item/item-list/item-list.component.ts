@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { ItemService } from 'src/app/services/item.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-item-list',
@@ -19,7 +20,8 @@ export class ItemListComponent implements OnInit {
   constructor(
     private itemService: ItemService,
     private location: Location,
-    private message: NzMessageService // Inject NzMessageService
+    private message: NzMessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +58,8 @@ export class ItemListComponent implements OnInit {
     this.itemService.deleteItem(item.itemId).subscribe(() => {
       this.listOfItems = this.listOfItems.filter(i => i.itemId !== item.itemId);
       this.message.success('Item deleted successfully');
+      this.loadDataFromServer(this.pageIndex, this.pageSize, null, null, []);
+      this.router.navigate(['/items/all']);
     }, error => {
       this.message.error('Error deleting item');
     });

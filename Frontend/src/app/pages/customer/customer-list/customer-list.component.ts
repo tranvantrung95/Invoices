@@ -66,6 +66,7 @@ export class CustomerListComponent implements OnInit {
           (c) => c.id !== customer.customerId
         );
         this.message.success('Customer deleted successfully.');
+        this.loadDataFromServer(this.pageIndex, this.pageSize, null, null, []);
         this.router.navigate(['/customers/all']);
       },
       (error) => {

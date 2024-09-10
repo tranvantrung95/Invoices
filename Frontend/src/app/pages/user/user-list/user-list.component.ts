@@ -56,6 +56,7 @@ export class UserListComponent implements OnInit {
       () => {
         this.message.success('User deleted successfully');
         this.loadDataFromServer(this.pageIndex, this.pageSize, null, null, []);
+        this.router.navigate(['/users/all']);
       },
       (error) => {
         this.message.error('Error deleting user');
