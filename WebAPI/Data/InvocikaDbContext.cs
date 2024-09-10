@@ -6,37 +6,27 @@ namespace WebAPI.Data
     public class InvoicikaDbContext : DbContext
     {
         public InvoicikaDbContext(DbContextOptions<InvoicikaDbContext> options)
-            : base(options)
-        {
-        }
+            : base(options) {}
 
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<CustomerInvoice> CustomerInvoices { get; set; }
+        public DbSet<CustomerInvoiceLine> CustomerInvoiceLines { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<VAT> Vats { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Define primary key for User
-            modelBuilder.Entity<User>()
-                .HasKey(u => u.UserId);
+            base.OnModelCreating(modelBuilder);
 
-            // Define primary key for Role
-            modelBuilder.Entity<Role>()
-                .HasKey(r => r.RoleId);
-
-            // Define primary key for Item
-            modelBuilder.Entity<Item>()
-                .HasKey(i => i.ItemId);
-
-            // Define relationships, indexes, etc.
-            // Example: One-to-many relationship between Role and User
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId);
-
-            // Example: Seed initial data here if required
-            // Note: Seeding here is optional if you seed data in Program.cs
+            modelBuilder.Entity<CustomerInvoiceLine>()
+                .HasOne(cil => cil.Item)
+                .WithMany(i => i.CustomerInvoiceLines)
+                .HasForeignKey(cil => cil.Item_id)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete, keeps foreign key reference intact
         }
+
     }
 }

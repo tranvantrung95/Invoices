@@ -7,7 +7,7 @@ namespace WebAPI.Models
     public class User
     {
         [Key]
-        public Guid UserId { get; set; } = Guid.NewGuid(); // Automatically generates a new GUID
+        public Guid UserId { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(256)]
@@ -18,21 +18,24 @@ namespace WebAPI.Models
         public string EmailAddress { get; set; }
 
         [StringLength(2048)]
-        public string? PhotoUrl { get; set; } // Optional
+        public string? PhotoUrl { get; set; } 
 
         [Required]
-        public string PasswordHash { get; set; } // Store password hash, not plaintext
+        public string PasswordHash { get; set; } 
 
         [Required]
-        public Guid RoleId { get; set; }
+        public Guid Role_id { get; set; }
 
-        [ForeignKey(nameof(RoleId))]
-        [JsonIgnore] // Prevent circular reference when serializing
+        [ForeignKey(nameof(Role_id))]
+        [JsonIgnore]
         public virtual Role Role { get; set; }
 
         [Required]
-        public DateTime CreationDate { get; set; } = DateTime.UtcNow; // Set default to current UTC time
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime? UpdateDate { get; set; } // Nullable
+        public DateTime? UpdateDate { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Item> Items { get; set; } = new List<Item>();
     }
 }

@@ -22,6 +22,111 @@ namespace WebAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("CustomerInvoice", b =>
+                {
+                    b.Property<Guid>("CustomerInvoiceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Customer_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("InvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("SubTotalAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("User_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<Guid>("Vat_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CustomerInvoiceId");
+
+                    b.HasIndex("Customer_id");
+
+                    b.HasIndex("User_id");
+
+                    b.HasIndex("Vat_id");
+
+                    b.ToTable("CustomerInvoices");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Customer", b =>
+                {
+                    b.Property<Guid>("CustomerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CustomerId");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.CustomerInvoiceLine", b =>
+                {
+                    b.Property<Guid>("InvoiceLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerInvoice_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Item_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("InvoiceLineId");
+
+                    b.HasIndex("CustomerInvoice_id");
+
+                    b.HasIndex("Item_id");
+
+                    b.ToTable("CustomerInvoiceLines");
+                });
+
             modelBuilder.Entity("WebAPI.Models.Item", b =>
                 {
                     b.Property<Guid>("ItemId")
@@ -52,12 +157,12 @@ namespace WebAPI.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("User_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ItemId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("User_id");
 
                     b.ToTable("Items");
                 });
@@ -106,7 +211,7 @@ namespace WebAPI.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.Property<Guid>("RoleId")
+                    b.Property<Guid>("Role_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -119,16 +224,79 @@ namespace WebAPI.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("Role_id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.VAT", b =>
+                {
+                    b.Property<Guid>("VatId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("decimal(4,2)");
+
+                    b.HasKey("VatId");
+
+                    b.ToTable("Vats");
+                });
+
+            modelBuilder.Entity("CustomerInvoice", b =>
+                {
+                    b.HasOne("WebAPI.Models.Customer", "Customer")
+                        .WithMany("CustomerInvoices")
+                        .HasForeignKey("Customer_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("User_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.VAT", "VAT")
+                        .WithMany("CustomerInvoices")
+                        .HasForeignKey("Vat_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("User");
+
+                    b.Navigation("VAT");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.CustomerInvoiceLine", b =>
+                {
+                    b.HasOne("CustomerInvoice", "CustomerInvoice")
+                        .WithMany("CustomerInvoiceLines")
+                        .HasForeignKey("CustomerInvoice_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.Item", "Item")
+                        .WithMany("CustomerInvoiceLines")
+                        .HasForeignKey("Item_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CustomerInvoice");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Item", b =>
                 {
                     b.HasOne("WebAPI.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithMany("Items")
+                        .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -139,16 +307,41 @@ namespace WebAPI.Migrations
                 {
                     b.HasOne("WebAPI.Models.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("Role_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("CustomerInvoice", b =>
+                {
+                    b.Navigation("CustomerInvoiceLines");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Customer", b =>
+                {
+                    b.Navigation("CustomerInvoices");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Item", b =>
+                {
+                    b.Navigation("CustomerInvoiceLines");
+                });
+
             modelBuilder.Entity("WebAPI.Models.Role", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.User", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.VAT", b =>
+                {
+                    b.Navigation("CustomerInvoices");
                 });
 #pragma warning restore 612, 618
         }

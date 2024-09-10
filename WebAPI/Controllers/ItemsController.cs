@@ -69,8 +69,7 @@ namespace WebAPI.Controllers
             existingItem.PurchasePrice = item.PurchasePrice;
             existingItem.SalePrice = item.SalePrice;
             existingItem.Quantity = item.Quantity;
-            existingItem.UserId = item.UserId;
-
+            existingItem.User_id = item.User_id;
             await _itemService.UpdateItemAsync(existingItem);
             return NoContent();
         }

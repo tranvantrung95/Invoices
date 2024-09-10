@@ -7,36 +7,38 @@ namespace WebAPI.Models
     public class Item
     {
         [Key]
-        public Guid ItemId { get; set; } = Guid.NewGuid(); // Automatically generates a new GUID
+        public Guid ItemId { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(256)]
         public string Name { get; set; }
 
         [StringLength(1024)]
-        public string? Description { get; set; } // Optional
+        public string? Description { get; set; } 
 
         [Required]
-        [Column(TypeName = "decimal(10,2)")] // Decimal type with precision 10 and scale 2
+        [Column(TypeName = "decimal(10,2)")] 
         public decimal PurchasePrice { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(10,2)")] // Decimal type with precision 10 and scale 2
+        [Column(TypeName = "decimal(10,2)")] 
         public decimal SalePrice { get; set; }
 
         [Required]
         public int Quantity { get; set; }
 
         [Required]
-        public Guid UserId { get; set; }
-
-        [ForeignKey(nameof(UserId))]
-        [JsonIgnore] // Prevent circular reference when serializing
+        public Guid User_id { get; set; }
+       
+        [ForeignKey(nameof(User_id))]
+        [JsonIgnore] 
         public virtual User User { get; set; }
 
         [Required]
-        public DateTime CreationDate { get; set; } = DateTime.UtcNow; // Set default to current UTC time
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime? UpdateDate { get; set; } // Nullable
+        public DateTime? UpdateDate { get; set; }
+      
+        public virtual ICollection<CustomerInvoiceLine> CustomerInvoiceLines { get; set; } = new List<CustomerInvoiceLine>();
     }
 }

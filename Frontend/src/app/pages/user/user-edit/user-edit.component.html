@@ -1,1 +1,65 @@
-<p>user-edit works!</p>
+<nz-page-header
+  class="site-page-header"
+  (nzBack)="onBack()"
+  nzBackIcon
+  nzTitle="Edit User">
+  <nz-page-header-extra>
+    <nz-space>
+      <button nz-button nzType="primary" [routerLink]="['/users/add']">
+        Add
+      </button>
+    </nz-space>
+  </nz-page-header-extra>
+</nz-page-header>
+
+<form nz-form [formGroup]="editUserForm" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Username</nz-form-label>
+    <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="usernameErrorTpl">
+      <input nz-input formControlName="username" placeholder="Enter username" />
+      <ng-template #usernameErrorTpl let-control>
+        <ng-container *ngIf="control.errors?.['required']">
+          Please input the username!
+        </ng-container>
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Email</nz-form-label>
+    <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="emailErrorTpl">
+      <input nz-input formControlName="emailAddress" placeholder="Enter email" />
+      <ng-template #emailErrorTpl let-control>
+        <ng-container *ngIf="control.errors?.['email']">
+          Please input a valid email address!
+        </ng-container>
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Role ID</nz-form-label>
+    <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="roleErrorTpl">
+      <input nz-input formControlName="role_id" placeholder="Enter role ID" />
+      <ng-template #roleErrorTpl let-control>
+        <ng-container *ngIf="control.errors?.['required']">
+          Please input the role ID!
+        </ng-container>
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7">Photo URL</nz-form-label>
+    <nz-form-control [nzSpan]="12" nzHasFeedback>
+      <input nz-input formControlName="photoUrl" placeholder="Enter photo URL" />
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-control [nzOffset]="7" [nzSpan]="12">
+      <button nz-button nzType="primary" [disabled]="!editUserForm.valid">Submit</button>
+      <button nz-button (click)="resetForm($event)">Reset</button>
+    </nz-form-control>
+  </nz-form-item>
+</form>

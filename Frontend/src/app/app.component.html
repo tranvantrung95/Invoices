@@ -1,36 +1,54 @@
 <nz-layout *ngIf="isLayout" class="app-layout">
-  <nz-sider class="menu-sidebar"
-            nzCollapsible
-            nzWidth="256px"
-            nzBreakpoint="md"
-            [(nzCollapsed)]="isCollapsed"
-            [nzTrigger]="null">
+  <nz-sider
+    class="menu-sidebar"
+    nzCollapsible
+    nzWidth="256px"
+    nzBreakpoint="md"
+    [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="null"
+  >
     <div class="sidebar-logo">
       <a href="https://ng.ant.design/" target="_blank">
-        <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
+        <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo" />
         <h1>Invoicika</h1>
       </a>
     </div>
-    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+    <ul
+      nz-menu
+      nzTheme="dark"
+      nzMode="inline"
+      [nzInlineCollapsed]="isCollapsed"
+    >
       <li nz-menu-item nzMatchRouter>
-        <a routerLink="/dashboard"><i nz-icon nzType="dashboard"></i><span>Dashboard</span></a>
+        <a routerLink="/dashboard"
+          ><i nz-icon nzType="dashboard"></i><span>Dashboard</span></a
+        >
       </li>
       <li nz-menu-item nzMatchRouter>
-        <a routerLink="/invoices/all"><i nz-icon nzType="send"></i><span>Invoices</span></a>
+        <a routerLink="/invoices/all"
+          ><i nz-icon nzType="send"></i><span>Invoices</span></a
+        >
       </li>
       <li nz-menu-item nzMatchRouter>
-        <a routerLink="/customers/all"><i nz-icon nzType="team"></i><span>Customers</span></a>
+        <a routerLink="/customers/all"
+          ><i nz-icon nzType="team"></i><span>Customers</span></a
+        >
       </li>
       <li nz-menu-item nzMatchRouter>
-        <a routerLink="/items/all"><i nz-icon nzType="folder-open"></i><span>Items</span></a>
+        <a routerLink="/items/all"
+          ><i nz-icon nzType="folder-open"></i><span>Items</span></a
+        >
       </li>
       <li nz-submenu nzOpen nzTitle="Settings" nzIcon="setting">
         <ul>
           <li nz-menu-item nzMatchRouter>
+            <a routerLink="/vat/all">VAT</a>
+          </li>
+          <li nz-menu-item nzMatchRouter>
             <a routerLink="/users/all">Users</a>
           </li>
           <li nz-menu-item nzMatchRouter>
-              <a routerLink="/roles/all">Roles</a>
+            <a routerLink="/roles/all">Roles</a>
           </li>
         </ul>
       </li>
@@ -40,10 +58,11 @@
     <nz-header>
       <div class="app-header">
         <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
-            <span class="trigger"
-               nz-icon
-               [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
-            ></span>
+          <span
+            class="trigger"
+            nz-icon
+            [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+          ></span>
         </span>
       </div>
     </nz-header>
