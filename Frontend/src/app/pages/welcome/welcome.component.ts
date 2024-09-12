@@ -8,9 +8,9 @@ import { Component, OnInit } from '@angular/core';
 export class WelcomeComponent implements OnInit {
 
   constructor() { }
-  sales = 125000;     // Total sales in dollars
+  sales = 11000;     // Total sales in dollars
   newOrders = 43;     // Number of new orders
-  activeUsers = 1340; // Number of active users
+  activeUsers = 15; // Number of active users
 
   ngOnInit() {
   }

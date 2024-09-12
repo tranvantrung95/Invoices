@@ -4,7 +4,7 @@ import { catchError, Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment'; // Import the environment
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
   private apiUrl = environment.apiUrl + 'users'; // Use the environment variable
@@ -30,7 +30,8 @@ export class UserService {
       });
     });
 
-    return this.http.get<any>(this.apiUrl, { params })
+    return this.http
+      .get<any>(this.apiUrl, { params })
       .pipe(catchError(() => of([])));
   }
 
@@ -39,7 +40,7 @@ export class UserService {
   }
 
   updateUser(userId: string, user: any): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${userId}`, user);
+    return this.http.patch<void>(`${this.apiUrl}/${userId}`, user);
   }
 
   getUserById(userId: string): Observable<any> {

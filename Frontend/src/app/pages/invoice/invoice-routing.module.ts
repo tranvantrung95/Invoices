@@ -7,7 +7,7 @@ import { InvoiceAddComponent } from './invoice-add/invoice-add.component';
 const routes: Routes = [
   { path: 'all', component: InvoiceListComponent },
   { path: 'add', component: InvoiceAddComponent },
-  { path: 'edit/:customerId', component: InvoiceEditComponent },
+  { path: 'edit/:customerinvoiceId', component: InvoiceEditComponent },
 ];
 
 @NgModule({

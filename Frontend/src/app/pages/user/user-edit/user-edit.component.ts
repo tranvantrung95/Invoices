@@ -13,7 +13,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class UserEditComponent implements OnInit {
   editUserForm: FormGroup;
   userId!: string;
-  listOfRoles: any[] = [];
+  roles: any[] = []; // Array to store roles fetched from the API
+  loading = true; // Boolean to track loading state
 
   constructor(
     private fb: NonNullableFormBuilder,
@@ -33,9 +34,24 @@ export class UserEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId')!;
-
     this.loadRoles(); // Fetch roles from API
+    this.loadUser(); // Fetch user details
+  }
 
+  loadRoles(): void {
+    this.roleService.getRoles().subscribe(
+      (roles) => {
+        this.roles = roles;
+        this.loadUser(); // Fetch user details after roles are loaded
+      },
+      (error) => {
+        console.error('Error fetching roles', error);
+        this.loading = false; // Set loading to false on error
+      }
+    );
+  }
+
+  loadUser(): void {
     this.userService.getUserById(this.userId).subscribe((user) => {
       this.editUserForm.patchValue({
         username: user.username,
@@ -43,16 +59,10 @@ export class UserEditComponent implements OnInit {
         role_id: user.role_id,
         photoUrl: user.photoUrl
       });
+      this.loading = false; // Set loading to false once user details are loaded
     }, error => {
       this.message.error('Error loading user details');
-    });
-  }
-
-  loadRoles(): void {
-    this.roleService.getRoles().subscribe((roles) => {
-      this.listOfRoles = roles;
-    }, error => {
-      this.message.error('Error loading roles');
+      this.loading = false; // Set loading to false on error
     });
   }
 

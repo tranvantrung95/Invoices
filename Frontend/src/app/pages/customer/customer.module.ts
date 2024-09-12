@@ -37,8 +37,7 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzInputModule,
     NzFormModule,
     NzNotificationModule,
-    NzMessageModule
-
-  ]
+    NzMessageModule,
+]
 })
 export class CustomerModule { }

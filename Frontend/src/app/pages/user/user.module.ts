@@ -15,6 +15,8 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzDividerModule } from 'ng-zorro-antd/divider'; // For displaying notifications
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 @NgModule({
   declarations: [UserEditComponent, UserListComponent, UserAddComponent],
@@ -32,6 +34,8 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzFormModule,
     NzNotificationModule,
     NzMessageModule,
+    NzSelectModule,
+    NzSpinModule,
   ],
 })
 export class UserModule {}
