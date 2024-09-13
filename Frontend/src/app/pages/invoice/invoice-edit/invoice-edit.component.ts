@@ -78,23 +78,25 @@ export class InvoiceEditComponent implements OnInit {
 
   loadInvoiceData() {
     if (this.invoiceId) {
-      this.invoiceService.getCustomerInvoiceById(this.invoiceId).subscribe((invoice: any) => {
-        this.validateForm.patchValue({
-          customerId: invoice.customer_id,
-          userId: invoice.user_id,
-          invoiceDate: invoice.invoiceDate,
-          vatId: invoice.vat_id,
-          subTotal: invoice.subTotalAmount,
-          tax: invoice.vatAmount,
-          total: invoice.totalAmount,
-        });
+      this.invoiceService
+        .getCustomerInvoiceById(this.invoiceId)
+        .subscribe((invoice: any) => {
+          this.validateForm.patchValue({
+            customerId: invoice.customer_id,
+            userId: invoice.user_id,
+            invoiceDate: invoice.invoiceDate,
+            vatId: invoice.vat_id,
+            subTotal: invoice.subTotalAmount,
+            tax: invoice.vatAmount,
+            total: invoice.totalAmount,
+          });
 
-        invoice.customerInvoiceLines.forEach((line: any) => {
-          this.addLineItemWithData(line);
-        });
+          invoice.customerInvoiceLines.forEach((line: any) => {
+            this.addLineItemWithData(line);
+          });
 
-        this.calculateTotals();
-      });
+          this.calculateTotals();
+        });
     }
   }
 
@@ -187,20 +189,31 @@ export class InvoiceEditComponent implements OnInit {
         })),
       };
 
-      this.invoiceService.updateCustomerInvoice(this.invoiceId, payload).subscribe({
-        next: () => {
-          this.message.success('Invoice updated successfully');
-          this.router.navigate(['/invoices/all']); // Redirect after success
-        },
-        error: (err) => {
-          this.message.error('Error updating invoice');
-          console.error('Error updating invoice:', err);
-        },
-      });
+      this.invoiceService
+        .updateCustomerInvoice(this.invoiceId, payload)
+        .subscribe({
+          next: () => {
+            this.message.success('Invoice updated successfully');
+            this.router.navigate(['/invoices/all']); // Redirect after success
+          },
+          error: (err) => {
+            this.message.error('Error updating invoice');
+            console.error('Error updating invoice:', err);
+          },
+        });
     }
   }
 
   onBack(): void {
     this.router.navigate(['/invoices/all']);
+  }
+
+  downloadInvoicePdf(invoiceId: string | null): void {
+    if (invoiceId) {
+      const url = `https://localhost:5001/api/customerinvoices/pdf/${invoiceId}`;
+      window.open(url, '_blank');
+    } else {
+      console.error('Invoice ID is not available');
+    }
   }
 }

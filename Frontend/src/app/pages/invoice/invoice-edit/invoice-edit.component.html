@@ -159,10 +159,15 @@
       <input nz-input [value]="validateForm.get('total')?.value" disabled />
     </nz-form-control>
   </nz-form-item>
-
   <nz-form-item>
     <nz-form-control [nzXs]="24" [nzSm]="8">
       <button nz-button nzType="primary" class="small-button">Submit</button>
     </nz-form-control>
   </nz-form-item>
 </form>
+
+<nz-form-item class="right-align">
+  <nz-form-control [nzXs]="24" [nzSm]="8">
+    <button (click)="downloadInvoicePdf(invoiceId)" nz-button nzType="primary" class="small-button">Print</button>
+  </nz-form-control>
+</nz-form-item>

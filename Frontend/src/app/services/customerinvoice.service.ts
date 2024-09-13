@@ -40,16 +40,19 @@ export class CustomerInvoiceService {
     return this.http.post<void>(this.apiUrl, customerInvoice);
   }
 
-  updateCustomerInvoice(customerInvoiceId: string, customerInvoice: any): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${customerInvoiceId}`, customerInvoice);
+  updateCustomerInvoice(
+    customerInvoiceId: string,
+    customerInvoice: any
+  ): Observable<void> {
+    return this.http.put<void>(
+      `${this.apiUrl}/${customerInvoiceId}`,
+      customerInvoice
+    );
   }
 
   getCustomerInvoiceById(customerInvoiceId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${customerInvoiceId}`);
   }
-  // getInvoiceById(invoiceId: string): Observable<any> {
-  //   return this.http.get<any>(`${this.apiUrl}/${invoiceId}`);
-  // }
 
   deleteCustomerInvoice(customerInvoiceId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${customerInvoiceId}`);
@@ -60,7 +63,9 @@ export class CustomerInvoiceService {
   }
 
   getCustomers(): Observable<any[]> {
-    return this.http.get<any[]>(this.customersUrl).pipe(catchError(() => of([])));
+    return this.http
+      .get<any[]>(this.customersUrl)
+      .pipe(catchError(() => of([])));
   }
 
   getUsers(): Observable<any[]> {

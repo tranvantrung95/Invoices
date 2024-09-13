@@ -10,10 +10,11 @@ namespace WebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-
-        public UsersController(IUserService userService)
+        private readonly IWebHostEnvironment _env;
+        public UsersController(IUserService userService, IWebHostEnvironment env)
         {
             _userService = userService;
+            _env = env;
         }
 
         [HttpGet]
@@ -51,7 +52,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDto userDto)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromForm] UserDto userDto, [FromForm] IFormFile? photo)
         {
             // Check if the provided ID matches the DTO's UserId
             if (id != userDto.UserId)
@@ -64,7 +65,17 @@ namespace WebAPI.Controllers
             {
                 return BadRequest("Username already exists");
             }
-
+            if (photo != null)
+            {
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(fileStream);
+                }
+                userDto.PhotoUrl = "/uploads/" + uniqueFileName;
+            }
             // Map the UserDto to a User model
             var user = MapToUser(userDto);
 
@@ -90,6 +101,8 @@ namespace WebAPI.Controllers
                 UserId = user.UserId,
                 Username = user.Username,
                 EmailAddress = user.EmailAddress,
+                PhotoUrl = user.PhotoUrl,
+                PasswordHash = user.PasswordHash,
                 Role_id = user.Role_id,
                 RoleName = user.Role?.RoleName,
                 CreationDate = user.CreationDate,
@@ -105,6 +118,7 @@ namespace WebAPI.Controllers
                 UserId = userDto.UserId,
                 Username = userDto.Username,
                 EmailAddress = userDto.EmailAddress,
+                PhotoUrl = userDto.PhotoUrl,
                 PasswordHash = userDto.PasswordHash,  // Make sure to handle password securely
                 Role_id = userDto.Role_id,
                 CreationDate = userDto.CreationDate ?? DateTime.UtcNow,

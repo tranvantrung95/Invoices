@@ -2,7 +2,8 @@
   class="site-page-header"
   (nzBack)="onBack()"
   nzBackIcon
-  nzTitle="Users List">
+  nzTitle="Users List"
+>
   <nz-page-header-extra>
     <nz-space>
       <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
@@ -14,11 +15,22 @@
         </button>
       </ng-template>
       <nz-divider nzType="vertical"></nz-divider>
-      <button nz-button nzType="dashed" (click)="loadDataFromServer(pageIndex, pageSize, null, null, [])">
+      <button
+        nz-button
+        nzType="dashed"
+        (click)="loadDataFromServer(pageIndex, pageSize, null, null, [])"
+      >
         <span nz-icon nzType="redo"></span> Refresh
       </button>
       <nz-divider nzType="vertical"></nz-divider>
-      <button *nzSpaceItem nz-button nzType="primary" [routerLink]="['/users/add']">Add New User</button>
+      <button
+        *nzSpaceItem
+        nz-button
+        nzType="primary"
+        [routerLink]="['/users/add']"
+      >
+        Add New User
+      </button>
     </nz-space>
   </nz-page-header-extra>
 </nz-page-header>
@@ -32,7 +44,8 @@
   [nzPageSize]="pageSize"
   [nzPageIndex]="pageIndex"
   (nzQueryParams)="onQueryParamsChange($event)"
-  nzBordered>
+  nzBordered
+>
   <thead>
     <tr>
       <th nzColumnKey="username" nzShowSort>Username</th>
@@ -46,15 +59,33 @@
     <tr *ngFor="let user of listOfUsers">
       <td>{{ user.username }}</td>
       <td>{{ user.emailAddress }}</td>
-      <td>{{ user.photoUrl }}</td>
+      <td>
+        <ng-container *ngIf="user.photoUrl">
+          <img
+            [src]="'https://localhost:5001' + user.photoUrl"
+            alt="Profile Photo"
+            style="max-width: 50px; margin-top: 10px"
+          />
+        </ng-container>
+      </td>
       <td>{{ user.roleName }}</td>
       <td>
         <a [routerLink]="['/users/edit', user.userId]">
-          <span nz-icon nzType="edit" nzTheme="outline" style="color: orange"></span>
+          <span
+            nz-icon
+            nzType="edit"
+            nzTheme="outline"
+            style="color: orange"
+          ></span>
         </a>
         <nz-divider nzType="vertical"></nz-divider>
         <a (click)="deleteUser(user)">
-          <span nz-icon nzType="delete" nzTheme="outline" style="color: red"></span>
+          <span
+            nz-icon
+            nzType="delete"
+            nzTheme="outline"
+            style="color: red"
+          ></span>
         </a>
       </td>
     </tr>

@@ -20,6 +20,9 @@
         public Guid InvoiceLineId { get; set; }
         public Guid CustomerInvoice_id { get; set; }
         public Guid Item_id { get; set; }
+
+        public string ItemName { get; set; }
+        public string ItemDescription { get; set; }
         public decimal Quantity { get; set; }
         public decimal Price { get; set; }
     }

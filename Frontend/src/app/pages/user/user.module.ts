@@ -17,6 +17,8 @@ import { NzDividerModule } from 'ng-zorro-antd/divider'; // For displaying notif
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzUploadModule } from 'ng-zorro-antd/upload';
+import { NzImageModule } from 'ng-zorro-antd/image';
 
 @NgModule({
   declarations: [UserEditComponent, UserListComponent, UserAddComponent],
@@ -36,6 +38,8 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     NzMessageModule,
     NzSelectModule,
     NzSpinModule,
+    NzUploadModule,
+    NzImageModule,
   ],
 })
 export class UserModule {}
