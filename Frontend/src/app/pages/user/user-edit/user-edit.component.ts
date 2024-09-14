@@ -73,9 +73,6 @@ export class UserEditComponent implements OnInit {
           photoUrl: user.photoUrl,
         });
         this.photoUrl = user.photoUrl; // Display existing photo
-        console.log('User:', user);
-        console.log('Form:', this.editUserForm.value);
-        console.log('Photourl:', this.photoUrl);
         this.loading = false; // Set loading to false once user details are loaded
       },
       (error) => {

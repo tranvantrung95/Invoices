@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as saveAs from 'file-saver';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { CustomerInvoiceService } from 'src/app/services/customerinvoice.service';
 
@@ -19,7 +20,7 @@ export class InvoiceEditComponent implements OnInit {
   subTotalAmount = 0;
   vatAmount = 0;
   totalAmount = 0;
-  invoiceId: string | null = null;
+  invoiceId: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -30,7 +31,8 @@ export class InvoiceEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.invoiceId = this.route.snapshot.paramMap.get('customerinvoiceId');
+    this.invoiceId =
+      this.route.snapshot.paramMap.get('customerinvoiceId') || '';
 
     this.validateForm = this.fb.group({
       customerId: [null, [Validators.required]],
@@ -71,8 +73,6 @@ export class InvoiceEditComponent implements OnInit {
   loadItems() {
     this.invoiceService.getItems().subscribe((data: any) => {
       this.itemsList = data.items;
-
-      console.log('Items:', this.itemsList);
     });
   }
 
@@ -107,7 +107,7 @@ export class InvoiceEditComponent implements OnInit {
   addLineItemWithData(lineItem: any) {
     const lineItemGroup = this.fb.group({
       item: [lineItem.item_id, Validators.required],
-      description: [lineItem.description],
+      description: [lineItem.itemDescription],
       quantity: [lineItem.quantity, Validators.required],
       price: [lineItem.price, Validators.required],
       total: [{ value: lineItem.quantity * lineItem.price, disabled: true }],
@@ -198,7 +198,6 @@ export class InvoiceEditComponent implements OnInit {
           },
           error: (err) => {
             this.message.error('Error updating invoice');
-            console.error('Error updating invoice:', err);
           },
         });
     }
@@ -208,15 +207,35 @@ export class InvoiceEditComponent implements OnInit {
     this.router.navigate(['/invoices/all']);
   }
 
-  downloadInvoicePdf(invoiceId: string | null): void {
-    if (invoiceId) {
-      const url = `https://localhost:5001/api/customerinvoices/pdf/${invoiceId}`;
-      window.open(url, '_blank');
-    } else {
-      console.error('Invoice ID is not available');
-    }
+  printInvoice(invoiceId: string): void {
+    this.invoiceService.makePdfInvoice(invoiceId).subscribe(
+      (response: Blob) => {
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const pdfWindow = window.open(url);
+        if (pdfWindow) {
+          pdfWindow.onload = () => {
+            pdfWindow.focus();
+            pdfWindow.print();
+          };
+        }
+      },
+      (error) => {
+        this.message.error('Error generating the invoice PDF');
+      }
+    );
   }
 
+  printInvoicePdf(invoiceId: string): void {
+    this.invoiceService.makePdfInvoice(invoiceId).subscribe(
+      (response: Blob) => {
+        saveAs(response, `Invoice_${invoiceId}.pdf`);
+      },
+      (error) => {
+        this.message.error('Error downloading the PDF');
+      }
+    );
+  }
 
   emailInvoicePdf(invoiceId: string): void {
     this.invoiceService.emailInvoice(invoiceId).subscribe({
@@ -225,7 +244,7 @@ export class InvoiceEditComponent implements OnInit {
       },
       error: (error) => {
         this.message.error(`Error sending invoice: ${error}`);
-      }
+      },
     });
   }
 }

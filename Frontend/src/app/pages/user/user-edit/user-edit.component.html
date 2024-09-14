@@ -4,13 +4,6 @@
   nzBackIcon
   nzTitle="Edit User"
 >
-  <nz-page-header-extra>
-    <nz-space>
-      <button nz-button nzType="primary" [routerLink]="['/users/add']">
-        Add
-      </button>
-    </nz-space>
-  </nz-page-header-extra>
 </nz-page-header>
 
 <div *ngIf="loading" class="spinner-container">
@@ -108,7 +101,7 @@
     <nz-form-item>
       <nz-form-control [nzOffset]="7" [nzSpan]="12">
         <button nz-button nzType="primary" [disabled]="!editUserForm.valid">
-          Submit
+          <span nz-icon nzType="edit"></span>Edit
         </button>
         <button nz-button (click)="resetForm($event)">Reset</button>
       </nz-form-control>

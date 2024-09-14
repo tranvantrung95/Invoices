@@ -41,8 +41,7 @@ export class UserListComponent implements OnInit {
         (response) => {
           this.loading = false;
           this.total = response.totalCount;
-          this.listOfUsers = response
-          console.log(this.listOfUsers);
+          this.listOfUsers = response;
         },
         (error) => {
           this.message.error('Error loading users');

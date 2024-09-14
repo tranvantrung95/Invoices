@@ -3,18 +3,11 @@
   (nzBack)="onBack()"
   nzBackIcon
   nzTitle="Add VAT">
-  <nz-page-header-extra>
-    <nz-space>
-      <button nz-button nzType="primary" [routerLink]="['/vats/add']">
-        Add
-      </button>
-    </nz-space>
-  </nz-page-header-extra>
 </nz-page-header>
 
 <form nz-form [formGroup]="addVatForm" (ngSubmit)="submitForm()">
   <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>VAT Percentage</nz-form-label>
+    <nz-form-label [nzSpan]="7" nzRequired>VAT Percentage (0-99)</nz-form-label>
     <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="percentageErrorTpl">
       <input nz-input type="number" formControlName="percentage" placeholder="Enter VAT percentage" />
       <ng-template #percentageErrorTpl let-control>
@@ -33,7 +26,7 @@
 
   <nz-form-item>
     <nz-form-control [nzOffset]="7" [nzSpan]="12">
-      <button nz-button nzType="primary" [disabled]="!addVatForm.valid">Submit</button>
+      <button nz-button nzType="primary" [disabled]="!addVatForm.valid"><span nz-icon nzType="plus"></span>Create</button>
       <button nz-button (click)="resetForm($event)">Reset</button>
     </nz-form-control>
   </nz-form-item>

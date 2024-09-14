@@ -1,8 +1,8 @@
 <nz-page-header nzTitle="Invoice details" nzSubtitle="" nzBackIcon [nzGhost]="false">
   <nz-page-header-extra>
-    <button nz-button nzType="primary" (click)="printInvoice(invoice.customerInvoiceId)">Print</button>
-    <button nz-button nzType="default" (click)="printInvoicePdf(invoice.customerInvoiceId)" style="margin-left: 8px;">PDF</button>
-    <button nz-button nzType="default" (click)="emailInvoicePdf(invoice.customerInvoiceId)" style="margin-left: 8px;">Email</button>
+    <button nz-button nzType="primary" (click)="printInvoice(invoice.customerInvoiceId)"><span nz-icon nzType="download"></span>Print</button>
+    <button nz-button nzType="default" (click)="printInvoicePdf(invoice.customerInvoiceId)" style="margin-left: 8px;"><span nz-icon nzType="printer"></span>PDF</button>
+    <button nz-button nzType="default" (click)="emailInvoicePdf(invoice.customerInvoiceId)" style="margin-left: 8px;"><span nz-icon nzType="mail"></span>Email</button>
   </nz-page-header-extra>
 </nz-page-header>
 
@@ -39,7 +39,7 @@
   </nz-row>
 
   <!-- Invoice Table -->
-  <nz-table #basicTable [nzData]="invoiceItems" [nzBordered]="true" [nzFrontPagination]="false" nzSize="middle">
+  <nz-table #basicTable [nzData]="invoiceItems" [nzBordered]="false" [nzFrontPagination]="false" nzSize="middle">
     <thead>
       <tr>
         <th>Product</th>

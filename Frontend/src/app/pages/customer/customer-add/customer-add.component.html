@@ -3,13 +3,6 @@
   (nzBack)="onBack()"
   nzBackIcon
   nzTitle="Add Customer">
-  <nz-page-header-extra>
-    <nz-space>
-      <button nz-button nzType="primary" [routerLink]="['/customers/add']">
-        Add
-      </button>
-    </nz-space>
-  </nz-page-header-extra>
 </nz-page-header>
 
 <form nz-form [formGroup]="addCustomerForm" (ngSubmit)="submitForm()">
@@ -53,7 +46,7 @@
 
   <nz-form-item>
     <nz-form-control [nzOffset]="7" [nzSpan]="12">
-      <button nz-button nzType="primary" [disabled]="!addCustomerForm.valid">Submit</button>
+      <button nz-button nzType="primary" [disabled]="!addCustomerForm.valid"><span nz-icon nzType="plus"></span>Create</button>
       <button nz-button (click)="resetForm($event)">Reset</button>
     </nz-form-control>
   </nz-form-item>
