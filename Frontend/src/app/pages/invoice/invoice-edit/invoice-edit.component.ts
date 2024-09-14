@@ -216,4 +216,16 @@ export class InvoiceEditComponent implements OnInit {
       console.error('Invoice ID is not available');
     }
   }
+
+
+  emailInvoicePdf(invoiceId: string): void {
+    this.invoiceService.emailInvoice(invoiceId).subscribe({
+      next: () => {
+        this.message.success('Invoice emailed successfully');
+      },
+      error: (error) => {
+        this.message.error(`Error sending invoice: ${error}`);
+      }
+    });
+  }
 }

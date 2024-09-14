@@ -63,6 +63,15 @@
       <td>{{ invoice.invoiceDate | date }}</td>
       <td>{{ invoice.totalAmount | currency }}</td>
       <td>
+        <a [routerLink]="['/invoices/show', invoice.customerInvoiceId]">
+          <span
+            nz-icon
+            nzType="eye"
+            nzTheme="outline"
+            style="color: grey"
+          ></span>
+        </a>
+        <nz-divider nzType="vertical"></nz-divider>
         <a [routerLink]="['/invoices/edit', invoice.customerInvoiceId]">
           <span
             nz-icon
