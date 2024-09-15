@@ -14,14 +14,17 @@ export class CustomerService {
     pageSize: number,
     sortField: string | null,
     sortOrder: string | null,
-    filters: Array<{ key: string; value: string[] }>
+    filters: Array<{ key: string; value: string[] }>,
+    searchTerm: string | null
   ): Observable<any> {
     let params = new HttpParams()
       .set('pageNumber', `${pageNumber}`)
       .set('pageSize', `${pageSize}`)
       .set('sortField', sortField || '')
       .set('sortOrder', sortOrder || '');
-
+      if (searchTerm) {
+        params = params.set('searchTerm', searchTerm);
+      }
     filters.forEach((filter) => {
       filter.value.forEach((value) => {
         params = params.append(filter.key, value);

@@ -7,7 +7,7 @@ namespace WebAPI.Services
 {
     public interface IItemService
     {
-        Task<PaginationResult<Item>> GetItemsPagedAndSortedAsync(int pageNumber, int pageSize);
+        Task<PaginationResult<Item>> GetItemsPagedAndSortedAsync(string? searchTerm, int pageNumber, int pageSize);
         Task<Item> GetItemByIdAsync(Guid id);
         Task AddItemAsync(Item item);
         Task UpdateItemAsync(Item item);
@@ -22,11 +22,23 @@ namespace WebAPI.Services
             _context = context;
         }
 
-        public async Task<PaginationResult<Item>> GetItemsPagedAndSortedAsync(int pageNumber, int pageSize)
+        public async Task<PaginationResult<Item>> GetItemsPagedAndSortedAsync(string? searchTerm, int pageNumber, int pageSize)
         {
-            var totalCount = await _context.Items.CountAsync();
-            var items = await _context.Items
-                .OrderByDescending(i => i.CreationDate) // Sorting by creation date
+            var query = _context.Items.AsQueryable();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                decimal salePriceSearch;
+                bool isNumeric = decimal.TryParse(searchTerm, out salePriceSearch);
+
+                query = query.Where(c =>
+                    c.Name.ToLower().Contains(searchTerm.ToLower()) ||
+                    (isNumeric && c.SalePrice == salePriceSearch)
+                );
+            }
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(i => i.CreationDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

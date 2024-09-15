@@ -12,6 +12,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class ItemEditComponent implements OnInit {
   editItemForm: FormGroup;
   itemId!: string;
+  loading = true;
   private user_id = '9b0e09a7-31d6-4897-8a3e-cc4cf4d1433a';
 
   constructor(
@@ -39,15 +40,17 @@ export class ItemEditComponent implements OnInit {
         purchasePrice: item.purchasePrice,
         salePrice: item.salePrice,
         quantity: item.quantity
-
       });
+      this.loading = false;
     }, error => {
+      this.loading = false;
       this.message.error('Error loading item details');
     });
   }
 
   submitForm(): void {
     if (this.editItemForm.valid) {
+      this.loading = true;
       const updatedItem = {
         itemId: this.itemId,
         user_id: this.user_id,
@@ -56,10 +59,12 @@ export class ItemEditComponent implements OnInit {
 
       this.itemService.updateItem(this.itemId, updatedItem).subscribe({
         next: () => {
+          this.loading = false;
           this.message.success('Item updated successfully');
           this.router.navigate(['/items/all']);
         },
         error: (err) => {
+          this.loading = false;
           this.message.error('Error updating item');
           console.error('Error updating item:', err);
         }

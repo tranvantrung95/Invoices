@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CustomerInvoiceService } from 'src/app/services/customerinvoice.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-invoice-list',
@@ -22,7 +23,8 @@ export class InvoiceListComponent implements OnInit {
     private invoiceService: CustomerInvoiceService,
     private router: Router,
     private message: NzMessageService,
-    private location: Location // For success/error messages
+    private location: Location,
+    private modal: NzModalService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +83,18 @@ export class InvoiceListComponent implements OnInit {
         this.message.error('Failed to delete invoice.');
       }
     );
+  }
+  showDeleteConfirm(invoice: any): void {
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this invoice?',
+      nzContent: '<b style="color: red;">This action cannot be undone.</b>',
+      nzOkText: 'Yes',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => this.deleteInvoice(invoice),
+      nzCancelText: 'No',
+      nzOnCancel: () => console.log('Cancel')
+    });
   }
 
   getCustomerName(customerId: string): string {

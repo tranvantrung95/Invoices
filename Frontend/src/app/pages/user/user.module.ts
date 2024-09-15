@@ -19,6 +19,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzImageModule } from 'ng-zorro-antd/image';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @NgModule({
   declarations: [UserEditComponent, UserListComponent, UserAddComponent],
@@ -40,6 +41,7 @@ import { NzImageModule } from 'ng-zorro-antd/image';
     NzSpinModule,
     NzUploadModule,
     NzImageModule,
+    NzModalModule
   ],
 })
 export class UserModule {}

@@ -21,6 +21,7 @@ export class InvoiceEditComponent implements OnInit {
   vatAmount = 0;
   totalAmount = 0;
   invoiceId: string = '';
+  loading = true;
 
   constructor(
     private fb: FormBuilder,
@@ -55,24 +56,28 @@ export class InvoiceEditComponent implements OnInit {
   loadCustomers() {
     this.invoiceService.getCustomers().subscribe((data: any) => {
       this.customersList = data.items;
+      this.loading = false;
     });
   }
 
   loadUsers() {
     this.invoiceService.getUsers().subscribe((data: any) => {
       this.usersList = data;
+      this.loading = false;
     });
   }
 
   loadVats() {
     this.invoiceService.getVats().subscribe((data: any) => {
       this.vatsList = data;
+      this.loading = false;
     });
   }
 
   loadItems() {
     this.invoiceService.getItems().subscribe((data: any) => {
       this.itemsList = data.items;
+      this.loading = false;
     });
   }
 
@@ -96,7 +101,10 @@ export class InvoiceEditComponent implements OnInit {
           });
 
           this.calculateTotals();
+          this.loading = false;
         });
+
+      this.loading = false;
     }
   }
 

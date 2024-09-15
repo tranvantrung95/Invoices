@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { VatService } from 'src/app/services/vat.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-vat-list',
@@ -21,7 +22,8 @@ export class VatListComponent implements OnInit {
     private vatService: VatService,
     private location: Location,
     private router: Router,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private modal: NzModalService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +74,19 @@ export class VatListComponent implements OnInit {
       }
     );
   }
+  showDeleteConfirm(vat: any): void {
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this VAT?',
+      nzContent: '<b style="color: red;">This action cannot be undone.</b>',
+      nzOkText: 'Yes',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => this.deleteVat(vat),
+      nzCancelText: 'No',
+      nzOnCancel: () => console.log('Cancel')
+    });
+  }
+
 
   // Navigate to the add VAT form
   addVat(): void {

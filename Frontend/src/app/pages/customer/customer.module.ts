@@ -4,7 +4,7 @@ import { CustomerRoutingModule } from './customer-routing.module';
 import { CustomerListComponent } from './customer-list/customer-list.component';
 import { CustomerAddComponent } from './customer-add/customer-add.component';
 import { CustomerEditComponent } from './customer-edit/customer-edit.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -15,6 +15,8 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzDividerModule } from 'ng-zorro-antd/divider';// For displaying notifications
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 
 
@@ -38,6 +40,9 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzFormModule,
     NzNotificationModule,
     NzMessageModule,
+    NzSpinModule,
+    FormsModule,
+    NzModalModule
 ]
 })
 export class CustomerModule { }

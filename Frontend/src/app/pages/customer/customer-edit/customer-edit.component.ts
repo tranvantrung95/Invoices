@@ -12,6 +12,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class CustomerEditComponent implements OnInit {
   editCustomerForm: FormGroup;
   customerId!: string;
+  loading = true;
 
   constructor(
     private fb: NonNullableFormBuilder,
@@ -37,13 +38,16 @@ export class CustomerEditComponent implements OnInit {
         phoneNumber: customer.phoneNumber,
         email: customer.email
       });
+      this.loading = false;
     }, error => {
       this.message.error('Error loading customer details');
+      this.loading = false;
     });
   }
 
   submitForm(): void {
     if (this.editCustomerForm.valid) {
+      this.loading = true;
       const updatedCustomer = {
         customerId: this.customerId,
         ...this.editCustomerForm.value
@@ -51,10 +55,12 @@ export class CustomerEditComponent implements OnInit {
 
       this.customerService.updateCustomer(this.customerId, updatedCustomer).subscribe({
         next: () => {
+          this.loading = false;
           this.message.success('Customer updated successfully');
           this.router.navigate(['/customers/all']);
         },
         error: (err) => {
+          this.loading = false;
           this.message.error('Error updating customer');
           console.error('Error updating customer:', err);
         }

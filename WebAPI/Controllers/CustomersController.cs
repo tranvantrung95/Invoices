@@ -17,9 +17,11 @@ namespace WebAPI.Controllers
 
         // GET: api/Customers
         [HttpGet]
-        public async Task<IActionResult> GetCustomers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        
+
+        public async Task<IActionResult> GetCustomers([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _customerService.GetCustomersPagedAndSortedAsync(pageNumber, pageSize);
+            var result = await _customerService.GetCustomersPagedAndSortedAsync(searchTerm, pageNumber, pageSize);
             return Ok(result);
         }
 

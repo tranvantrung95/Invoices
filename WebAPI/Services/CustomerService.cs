@@ -7,7 +7,7 @@ namespace WebAPI.Services
 {
     public interface ICustomerService
     {
-        Task<PaginationResult<Customer>> GetCustomersPagedAndSortedAsync(int pageNumber, int pageSize);
+        Task<PaginationResult<Customer>> GetCustomersPagedAndSortedAsync(string? searchTerm, int pageNumber, int pageSize);
         Task<Customer> GetCustomerByIdAsync(Guid id);
         Task AddCustomerAsync(Customer customer);
         Task UpdateCustomerAsync(Customer customer);
@@ -22,10 +22,16 @@ namespace WebAPI.Services
             _context = context;
         }
 
-        public async Task<PaginationResult<Customer>> GetCustomersPagedAndSortedAsync(int pageNumber, int pageSize)
+        public async Task<PaginationResult<Customer>> GetCustomersPagedAndSortedAsync(string? searchTerm, int pageNumber, int pageSize)
         {
-            var totalCount = await _context.Customers.CountAsync();
-            var customers = await _context.Customers
+            var query = _context.Customers.AsQueryable();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(c => c.Name.ToLower().Contains(searchTerm) || (c.Email != null && c.Email.ToLower().Contains(searchTerm)));
+            }
+            var totalCount = await query.CountAsync();
+            var customers = await query
                 .OrderByDescending(i => i.CreationDate) // Sorting by creation date
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

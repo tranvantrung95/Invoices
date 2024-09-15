@@ -19,10 +19,10 @@ export class UserEditComponent implements OnInit {
   editUserForm: FormGroup;
   userId!: string;
   roles: any[] = [];
-  loading = true;
   selectedFile: File | null = null;
   selectedFilePreview: File | null = null;
   photoUrl: string | null = null;
+  loading = true;
 
   constructor(
     private fb: NonNullableFormBuilder,
@@ -46,8 +46,8 @@ export class UserEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId')!;
-    this.loadRoles(); // Fetch roles from API
-    this.loadUser(); // Fetch user details
+    this.loadRoles();
+    this.loadUser();
   }
 
   loadRoles(): void {

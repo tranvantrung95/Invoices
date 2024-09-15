@@ -17,14 +17,15 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { InvoiceShowComponent } from './invoice-show/invoice-show.component';
-
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 @NgModule({
   declarations: [
     InvoiceListComponent,
     InvoiceAddComponent,
     InvoiceEditComponent,
-    InvoiceShowComponent
+    InvoiceShowComponent,
   ],
   imports: [
     CommonModule,
@@ -39,8 +40,9 @@ import { InvoiceShowComponent } from './invoice-show/invoice-show.component';
     NzFormModule,
     ReactiveFormsModule,
     NzSelectModule,
-    NzDatePickerModule
-
-  ]
+    NzDatePickerModule,
+    NzSpinModule,
+    NzModalModule,
+  ],
 })
-export class InvoiceModule { }
+export class InvoiceModule {}

@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
 using WebAPI.Services;
-using WebAPI.Helpers; // Ensure you include this namespace
+
 
 namespace WebAPI.Controllers
 {
     [ApiController]
+   // [Authorize]
     [Route("api/[controller]")]
     public class ItemsController : ControllerBase
     {
@@ -17,14 +19,16 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/Items
+        //[Authorize(Roles = "Employee, Admin")]
         [HttpGet]
-        public async Task<IActionResult> GetItems([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetItems([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _itemService.GetItemsPagedAndSortedAsync(pageNumber, pageSize);
+            var result = await _itemService.GetItemsPagedAndSortedAsync(searchTerm, pageNumber, pageSize);
             return Ok(result);
         }
 
         // GET: api/Items/{id}
+       // [Authorize(Roles = "Employee, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetItemById(Guid id)
         {
@@ -37,6 +41,7 @@ namespace WebAPI.Controllers
         }
 
         // POST: api/Items
+       // [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateItem([FromBody] Item item)
         {
@@ -50,6 +55,7 @@ namespace WebAPI.Controllers
         }
 
         // PUT: api/Items/{id}
+       // [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateItem(Guid id, [FromBody] Item item)
         {
@@ -75,6 +81,7 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/Items/{id}
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(Guid id)
         {

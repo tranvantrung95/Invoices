@@ -16,6 +16,7 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzDividerModule } from 'ng-zorro-antd/divider';// For displaying notifications
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzInputModule,
     NzFormModule,
     NzNotificationModule,
-    NzMessageModule
+    NzMessageModule,
+    NzModalModule
 
   ]
 })

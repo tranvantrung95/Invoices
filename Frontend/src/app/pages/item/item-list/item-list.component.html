@@ -2,15 +2,15 @@
   <nz-page-header-extra>
     <nz-space>
       <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-        <input type="text" nz-input placeholder="Search" />
+        <input type="text" [(ngModel)]="searchText" nz-input placeholder="Search Name / SalePrice" />
       </nz-input-group>
       <ng-template #suffixIconButton>
-        <button nz-button nzSearch>
+        <button nz-button nzSearch (click)="onSearch()">
           <span nz-icon nzType="search"></span>
         </button>
       </ng-template>
       <nz-divider nzType="vertical"></nz-divider>
-      <button nz-button nzType="dashed" (click)="loadDataFromServer(pageIndex, pageSize, null, null, [])">
+      <button nz-button nzType="dashed" (click)="loadDataFromServer(pageIndex, pageSize, null, null, [], null)">
         <span nz-icon nzType="redo"></span>
         Refresh
       </button>
@@ -53,7 +53,7 @@
           <span nz-icon nzType="edit" nzTheme="outline" style="color: orange;"></span>
         </a>
         <nz-divider nzType="vertical"></nz-divider>
-        <a (click)="deleteItem(item)">
+        <a (click)="showDeleteConfirm(item)">
           <span nz-icon nzType="delete" nzTheme="outline" style="color: red"></span>
         </a>
       </td>

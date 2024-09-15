@@ -3,6 +3,7 @@ import { UserService } from 'src/app/services/user.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Router } from '@angular/router';
 import { RoleService } from 'src/app/services/role.service';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-user-list',
@@ -20,7 +21,8 @@ export class UserListComponent implements OnInit {
     private userService: UserService,
     private roleService: RoleService,
     private message: NzMessageService,
-    private router: Router
+    private router: Router,
+    private modal: NzModalService
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +63,18 @@ export class UserListComponent implements OnInit {
         this.message.error('Error deleting user');
       }
     );
+  }
+  showDeleteConfirm(user: any): void {
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this user?',
+      nzContent: '<b style="color: red;">This action cannot be undone.</b>',
+      nzOkText: 'Yes',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => this.deleteUser(user), // Call deleteUser if confirmed
+      nzCancelText: 'No',
+      nzOnCancel: () => console.log('Cancel')
+    });
   }
 
   onQueryParamsChange(params: any): void {
