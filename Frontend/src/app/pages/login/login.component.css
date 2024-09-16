@@ -5,16 +5,16 @@
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 20px;
- 
+
   text-align: center;
 }
 .container {
-  padding: 20px;
-  background-color: lightcoral;
+  padding: 100px 200px;
+  background-color: rgb(223, 223, 223);
   text-align: center;
 }
 .login-form {
-  max-width: 300px;
+  width: 360px;
 }
 
 .login-form-margin {

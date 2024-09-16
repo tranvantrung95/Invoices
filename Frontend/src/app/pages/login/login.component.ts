@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -7,19 +9,20 @@ import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@ang
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  validateForm: FormGroup<{
-    userName: FormControl<string>;
-    password: FormControl<string>;
-    remember: FormControl<boolean>;
-  }> = this.fb.group({
-    userName: ['', [Validators.required]],
-    password: ['', [Validators.required]],
-    remember: [true]
+  validateForm: FormGroup = new FormGroup({
+    userName: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
   });
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   submitForm(): void {
     if (this.validateForm.valid) {
-      console.log('submit', this.validateForm.value);
+      const { userName, password } = this.validateForm.value;
+      this.authService.login(userName, password).subscribe({
+        next: () => this.router.navigate(['/dashboard']),
+        error: (err) => console.error('Login failed', err),
+      });
     } else {
       Object.values(this.validateForm.controls).forEach(control => {
         if (control.invalid) {
@@ -29,6 +32,4 @@ export class LoginComponent {
       });
     }
   }
-
-  constructor(private fb: NonNullableFormBuilder) {}
 }

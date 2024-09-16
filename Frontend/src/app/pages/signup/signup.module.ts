@@ -10,6 +10,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
     NzButtonModule,
     NzInputModule,
     NzCardModule,
-    NzGridModule
+    NzGridModule,
+    NzCheckboxModule
   ]
 })
 export class SignupModule { }

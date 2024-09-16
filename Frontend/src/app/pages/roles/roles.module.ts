@@ -8,6 +8,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
     NzDividerModule,
     NzPageHeaderModule,
     NzButtonModule,
+    NzSpinModule
   ]
 })
 export class RolesModule { }

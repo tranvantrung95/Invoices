@@ -1,4 +1,4 @@
-<nz-layout *ngIf="isLayout" class="app-layout">
+<nz-layout *ngIf="authService.isAuthenticated()" class="app-layout">
   <nz-sider
     class="menu-sidebar"
     nzCollapsible
@@ -64,6 +64,19 @@
             [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
           ></span>
         </span>
+        <div class="user">
+          <!-- Dropdown Menu for User Actions -->
+          <a nz-dropdown [nzDropdownMenu]="menu" class="ant-dropdown-link">
+            {{ username }}
+            <span nz-icon nzType="down"></span>
+          </a>
+          <nz-dropdown-menu #menu="nzDropdownMenu">
+            <ul nz-menu nzSelectable>
+              <li nz-menu-item [routerLink]="['/users/edit', userId]">Profile</li>
+              <li nz-menu-item (click)="authService.logout()">Logout</li>
+            </ul>
+          </nz-dropdown-menu>
+        </div>
       </div>
     </nz-header>
     <nz-content>
@@ -71,7 +84,10 @@
         <router-outlet></router-outlet>
       </div>
     </nz-content>
-    <nz-footer>Invoicika ©2024 Developed By <a href="https://codebangla.com" target="_blank">CodeBANGLA</a></nz-footer>
+    <nz-footer
+      >Invoicika ©2024 Developed By
+      <a href="https://codebangla.com" target="_blank">CodeBANGLA</a></nz-footer
+    >
   </nz-layout>
 </nz-layout>
-<router-outlet *ngIf="!isLayout"></router-outlet>
+<router-outlet *ngIf="!authService.isAuthenticated()"></router-outlet>

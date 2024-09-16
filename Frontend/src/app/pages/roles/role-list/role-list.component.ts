@@ -10,6 +10,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 })
 export class RoleListComponent implements OnInit {
   roles: any[] = [];
+  loading = true;
 
   constructor(
     private roleService: RoleService,
@@ -21,8 +22,10 @@ export class RoleListComponent implements OnInit {
     this.roleService.getRoles().subscribe({
       next: (roles) => {
         this.roles = roles;
+        this.loading = false;
       },
       error: (err) => {
+        this.loading = false;
         this.message.error('Failed to load roles');
         console.error(err);
       },

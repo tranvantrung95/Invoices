@@ -18,14 +18,10 @@ import { NzFormTooltipIcon } from 'ng-zorro-antd/form';
 })
 export class SignupComponent {
   validateForm: FormGroup<{
+    username: FormControl<string>;
     email: FormControl<string>;
     password: FormControl<string>;
     checkPassword: FormControl<string>;
-    nickname: FormControl<string>;
-    phoneNumberPrefix: FormControl<'+86' | '+87'>;
-    phoneNumber: FormControl<string>;
-    website: FormControl<string>;
-    captcha: FormControl<string>;
     agree: FormControl<boolean>;
   }>;
   captchaTooltipIcon: NzFormTooltipIcon = {
@@ -66,15 +62,11 @@ export class SignupComponent {
 
   constructor(private fb: NonNullableFormBuilder) {
     this.validateForm = this.fb.group({
+      username: ['', [Validators.required]],
       email: ['', [Validators.email, Validators.required]],
       password: ['', [Validators.required]],
       checkPassword: ['', [Validators.required, this.confirmationValidator]],
-      nickname: ['', [Validators.required]],
-      phoneNumberPrefix: '+86' as '+86' | '+87',
-      phoneNumber: ['', [Validators.required]],
-      website: ['', [Validators.required]],
-      captcha: ['', [Validators.required]],
-      agree: [false]
+      agree: [true]
     });
   }
 }
