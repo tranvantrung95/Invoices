@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Dtos;
 using WebAPI.Data;
-using System;
-using PuppeteerSharp.Media;
-using PuppeteerSharp;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
+using QuestPDF.Helpers;
 
 namespace WebAPI.Services
 {
@@ -15,8 +15,8 @@ namespace WebAPI.Services
         Task CreateCustomerInvoiceAsync(CustomerInvoiceDto dto);
         Task<bool> UpdateCustomerInvoiceAsync(Guid id, CustomerInvoiceDto dto);
         Task DeleteCustomerInvoiceAsync(Guid id);
-        Task<string> GenerateInvoiceHtmlAsync(Guid invoiceId);
-     
+        Task<byte[]> GenerateInvoicePdfAsync(Guid invoiceId);
+
     }
 
     public class CustomerInvoiceService : ICustomerInvoiceService
@@ -209,212 +209,172 @@ namespace WebAPI.Services
         }
 
 
-        public async Task<string> GenerateInvoiceHtmlAsync(Guid invoiceId)
+        public async Task<byte[]> GenerateInvoicePdfAsync(Guid invoiceId)
         {
-            var invoiceDto = await GetCustomerInvoiceByIdAsync(invoiceId);
+            var invoice = await GetCustomerInvoiceByIdAsync(invoiceId);
 
-            if (invoiceDto == null)
+            if (invoice == null)
             {
-                throw new Exception("Invoice not found.");
+                throw new ArgumentException("Invoice not found", nameof(invoiceId));
             }
 
-            var customer = await _context.Customers.FindAsync(invoiceDto.Customer_id);
-            var logoPath = Path.Combine(_environment.WebRootPath, "uploads", "b108a579-ae05-432f-9dc4-fca8f87c8009_gh.png");
-            var logoBase64 = Convert.ToBase64String(await File.ReadAllBytesAsync(logoPath));
+            var companyInfo = new
+            {
+                CompanyName = "Invoicika Inc.",
+                Address = "456 Business Road, Metropolis",
+                Email = "info@invoicika.com",
+                PhoneNumbers = new[] { "555-1010", "555-1020", "555-3030" }
+            };
 
-            var htmlContent = $@"
-                <!DOCTYPE html>
-                <html lang='en'>
-                <head>
-                  <meta charset='UTF-8'>
-                  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                  <title>Invoice</title>
-                  <link href='https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap' rel='stylesheet'>
-                  <style>
-                    body {{
-                      font-family: 'Nunito', sans-serif;
-                      font-size: 14px;
-                      font-weight:400;
-                      margin: 0;
-                      padding: 0;
-                    }}
+            var customerInfo = new
+            {
+                Name = invoice.Customer_id,  // Replace with actual values if available
+                Address = invoice.Customer_id, 
+                Phone = invoice.Customer_id    
+            };
 
-                    .invoice-container {{
-                      width: 100%;
-                      max-width: 720px;
-                      margin: 0 auto;
-                      padding: 20px;
-                    }}
+            // Calculations for subtotal, VAT, and total
+            var subTotal = invoice.SubTotalAmount;
+            var vat = subTotal * (invoice.VatAmount/100); 
+            var total = invoice.TotalAmount;
 
-                    .header {{
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: flex-start;
-                      margin-bottom: 20px;
-                    }}
+            var document = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4); 
+                    page.Margin(1, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(9));
 
-                    .invoice-title {{
-                      font-size: 32px;
-                      font-weight: bold;
-                      text-align: left;
-                      margin-bottom: 5px;
-                      color: #1890ff;
-                    }}
+                    page.Header().Row(row =>
+                    {
+                        row.ConstantItem(20).Image("wwwroot/uploads/invoicika.png").FitArea();
+                        row.RelativeItem().Column(column =>
+                        {
+                            column.Item().Text(companyInfo.CompanyName).Bold().FontSize(18).AlignLeft();
+                        });
+                    });
 
-                    .date-info {{
-                      text-align: right;
-                    }}
+                     page.Content().PaddingVertical(20).Column(column =>
+                    {
+                        
+                        column.Item().Row(row =>
+                        {
+                            row.RelativeItem().Column(columnLeft =>
+                            {
+                                columnLeft.Item().Text("Company Info").Bold().FontSize(10);
+                                columnLeft.Item().Text($"{companyInfo.CompanyName}").Bold().FontSize(12);
+                                columnLeft.Item().Text($"Address: {companyInfo.Address}");
+                                columnLeft.Item().Text($"Email: {companyInfo.Email}");
+                                foreach (var phone in companyInfo.PhoneNumbers)
+                                {
+                                    columnLeft.Item().Text($"Phone: {phone}");
+                                }
+                            });
 
-                    .company-info {{
-                      text-align: left;
-                    }}
+                            row.RelativeItem().Column(columnRight =>
+                            {
+                                columnRight.Item().Text("Customer Info").Bold().FontSize(10);
+                                columnRight.Item().Text($"Name: {customerInfo.Name}").Bold().FontSize(12);
+                                columnRight.Item().Text($"Address: {customerInfo.Address}");
+                                columnRight.Item().Text($"Phone: {customerInfo.Phone}");
+                            });
+                        });
 
-                    .company-info img {{
-                      width: 180px;
-                      height: 80px;
-                      margin-bottom: 10px;
-                    }}
+                        
+                        column.Item().PaddingTop(5).PaddingBottom(15).LineHorizontal(1).LineColor(Colors.Blue.Medium);
+                        column.Item().Table(table =>
+                        {
+                            
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(100);  
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
 
-                    .company-info p {{
-                      margin: 5px 0;
-                    }}
+                            table.Header(header =>
+                            {
+                                header.Cell().Element(CellStyle).Text("Product Name");
+                                header.Cell().Element(CellStyle).Text("Description");
+                                header.Cell().Element(CellStyle).AlignRight().Text("Unit Price");
+                                header.Cell().Element(CellStyle).AlignRight().Text("Quantity");
+                                header.Cell().Element(CellStyle).AlignRight().Text("Total");
 
-                    .customer-info p {{
-                      margin: 5px 0;
-                    }}
+                                static IContainer CellStyle(IContainer container)
+                                {
+                                    return container.DefaultTextStyle(x => x.Bold()).PaddingVertical(10).BorderBottom(1).BorderColor(Colors.Black).Background(Colors.Blue.Lighten2);
+                                }
+                            });
 
-                    .customer-info {{
-                      text-align: right;
-                    }}
+                            foreach (var line in invoice.CustomerInvoiceLines)
+                            {
+                                table.Cell().Element(CellStyle).Text(line.ItemName);
+                                table.Cell().Element(CellStyle).Text(line.ItemDescription);
+                                table.Cell().Element(CellStyle).AlignRight().Text($"{line.Price}$");
+                                table.Cell().Element(CellStyle).AlignRight().Text(line.Quantity.ToString());
+                                table.Cell().Element(CellStyle).AlignRight().Text($"{line.Price * line.Quantity}$");
 
-                    .invoice-table {{
-                      width: 100%;
-                      border-collapse: collapse;
-                      margin-top: 20px;
-                    }}
+                                static IContainer CellStyle(IContainer container)
+                                {
+                                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(3);
+                                }
+                            }
+                        });
 
-                    .invoice-table th {{
-                      background-color: #1890ff;
-                      text-align: right;
-                      padding: 10px;
-                      font-weight: bold;
-                    }}
+                        // Add Subtotal, VAT, and Total section at the bottom
+                        column.Item().Table(table =>
+                        {
+                            // Define two columns: Labels and Values
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(100);  
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
 
-                    .invoice-table th:first-child {{
-                      text-align: left;
-                    }}
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Subtotal:");
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{subTotal}$");
 
-                    .invoice-table td {{
-                      padding: 10px;
-                      text-align: right;
-                    }}
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("VAT (5%):");
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{vat}$");
 
-                    .invoice-table td:first-child {{
-                      text-align: left;
-                    }}
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Total:").FontColor(Colors.Blue.Darken2).Bold().FontSize(10);
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{total}$").FontColor(Colors.Blue.Darken2).Bold().FontSize(10);
 
-                    .invoice-table tr:nth-child(even) {{
-                      background-color: #f9f9f9;
-                    }}
+                            static IContainer LabelCellStyle(IContainer container)
+                            {
+                                return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).AlignRight();
+                            }
 
-                    .invoice-table tr:nth-child(odd) {{
-                      background-color: #ffffff;
-                    }}
-                    .product-description {{ display: block;
-                      font-size: 12px;
-                      color: #666;
-                    }}
-                    .summary-row td {{
-                      font-weight: bold;
-                      padding: 10px 10px;
-                    }}
+                            static IContainer ValueCellStyle(IContainer container)
+                            {
+                                return container.DefaultTextStyle(x => x.Bold()).PaddingVertical(5);
+                            }
+                        });
+                    });
 
-                    .total-row td {{
-                      font-weight: bold;
-                      background-color: #1890ff;
-                      padding: 10px 10px;
-                    }}
+                    page.Footer().AlignCenter().Column(column =>
+                    {
+                        column.Item().PaddingTop(10).LineHorizontal(1).LineColor(Colors.Grey.Medium);
+                        column.Spacing(2);
+                        column.Item().Text("This computer-generated document is valid without signature.").AlignCenter();
+                    });
+                });
+            });
 
-                    .summary td {{
-                      text-align: right;
-                    }}
-
-                    .summary-row td:first-child,
-                    .total-row td:first-child {{
-                      text-align: right;
-                      padding-right: 50px;
-                    }}
-                  </style>
-                </head>
-
-                <body>
-
-                  <div class='invoice-container'>
-                    <!-- Header Section -->
-                    <div class='header'>
-                      <div>
-                        <p class='invoice-title'>INVOICE</p>
-                        <div class='company-info'>
-                          <img src='data:image/png;base64,{logoBase64}' alt='Company Logo'>
-                          <p><strong>CodeBANGLA Ltd.</strong></p>
-                          <p>1234 Market St., San Francisco, CA 94103</p>
-                          <p>Phone: (123) 456-7890</p>
-                          <p>Email: romi@codebangla.com</p>
-                        </div>
-                      </div>
-                      <div class='date-info'>
-                        <p><strong>Invoice No: #{invoiceDto.CustomerInvoiceId}</strong></p>
-                        <p><strong>Date: {invoiceDto.InvoiceDate:yyyy-MM-dd}</strong></p>
-                        <div class='customer-info'>
-                          <p><strong>{customer.Name}</strong></p>
-                          <p>{customer.Address}</p>
-                          <p>{customer.PhoneNumber}</p>
-                          <p>Email: {customer.Email}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Invoice Table -->
-                    <table class='invoice-table'>
-                      <thead>
-                        <tr>
-                          <th>Item</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                          <th>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {string.Join("", invoiceDto.CustomerInvoiceLines.Select(line => $@"
-                        <tr>
-                          <td>{line.ItemName} <span class=""product-description"">{line.ItemDescription}</span></td>
-                          <td>{line.Quantity}</td>
-                          <td>{line.Price:C}</td>
-                          <td>{(line.Price * line.Quantity):C}</td>
-                        </tr>"))}
-                      </tbody>
-                      <!-- Subtotal, VAT, Total -->
-                      <tfoot style='border-top: 1px solid #1890ff;'>
-                        <tr class='summary-row'>
-                          <td colspan='3' style='padding-right: 10px;'>Subtotal</td>
-                          <td>{invoiceDto.SubTotalAmount:C}</td>
-                        </tr>
-                        <tr class='summary-row'>
-                          <td colspan='3' style='padding-right: 10px;'>VAT</td>
-                          <td>{invoiceDto.VatAmount:C}</td>
-                        </tr>
-                        <tr class='total-row'>
-                          <td colspan='3' style='padding-right: 10px;'>Total</td>
-                          <td>{invoiceDto.TotalAmount:C}</td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-
-                </body>
-                </html>";
-            return htmlContent;
+            using (var stream = new MemoryStream())
+            {
+                document.GeneratePdf(stream);
+                return await Task.FromResult(stream.ToArray());
+            }
         }
+
 
     }
 

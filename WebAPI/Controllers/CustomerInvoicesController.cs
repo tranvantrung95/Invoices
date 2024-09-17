@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PuppeteerSharp.Media;
-using PuppeteerSharp;
 using WebAPI.Dtos;
 using WebAPI.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers
 {
@@ -94,35 +91,12 @@ namespace WebAPI.Controllers
         {
             try
             {
-                // Fetch the invoice details and generate HTML content
-                var htmlContent = await _service.GenerateInvoiceHtmlAsync(id);
-
-                // Setup Puppeteer and download the latest Chromium
-                var browserFetcher = new BrowserFetcher();
-                await browserFetcher.DownloadAsync();
-
-                // Launch headless browser
-                using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
-                using (var page = await browser.NewPageAsync())
-                {
-                    // Set content
-                    await page.SetContentAsync(htmlContent);
-
-                    // Generate PDF
-                    var pdfBytes = await page.PdfDataAsync(new PdfOptions
-                    {
-                        Format = PaperFormat.A4,
-                        PrintBackground = true
-                    });
-
-                    // Return PDF as a file
-                    return File(pdfBytes, "application/pdf", $"invoice-{id}.pdf");
-                }
+                var pdfBytes = await _service.GenerateInvoicePdfAsync(id);
+                return File(pdfBytes, "application/pdf", "invoice.pdf");
             }
             catch (Exception ex)
             {
-                // Handle exceptions here
-                return StatusCode(500, $"Error generating PDF: {ex.Message}");
+                return NotFound(ex.Message);
             }
         }
 
