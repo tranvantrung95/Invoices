@@ -43,6 +43,7 @@ namespace WebAPI.Data
                             Username = "admin1",
                             EmailAddress = "admin1@example.com",
                             PasswordHash = HashPassword("admin1"),
+                            PhotoUrl = "/uploads/admin1.png",
                             Role_id = adminRole.RoleId,
                             CreationDate = DateTime.UtcNow
                         },
@@ -51,6 +52,7 @@ namespace WebAPI.Data
                             Username = "admin2",
                             EmailAddress = "admin2@example.com",
                             PasswordHash = HashPassword("admin2"),
+                            PhotoUrl = "/uploads/admin2.png",
                             Role_id = adminRole.RoleId,
                             CreationDate = DateTime.UtcNow
                         },
@@ -59,7 +61,8 @@ namespace WebAPI.Data
                             Username = "employee1",
                             EmailAddress = "employee1@example.com",
                             PasswordHash = HashPassword("employee1"),
-                            Role_id = adminRole.RoleId,
+                            PhotoUrl = "/uploads/employee1.jpg",
+                            Role_id = employeeRole.RoleId,
                             CreationDate = DateTime.UtcNow
                         },
                         new User
@@ -230,6 +233,32 @@ namespace WebAPI.Data
 
                     context.Customers.AddRange(customers);
                     logger.LogInformation("Customers added to the database.");
+                    var vats = new List<VAT>
+                    {
+                        new VAT
+                        {
+                            VatId = Guid.NewGuid(),
+                            Percentage = 0.00m,
+                            CreationDate = DateTime.UtcNow
+                        },
+                        new VAT
+                        {
+                            VatId = Guid.NewGuid(),
+                            Percentage = 5.00m,
+                            CreationDate = DateTime.UtcNow
+                        },
+                        new VAT
+                        {
+                            VatId = Guid.NewGuid(),
+                            Percentage = 10.00m,
+                            CreationDate = DateTime.UtcNow
+                        }
+                    };
+
+                    // Add VAT entries to the context
+                    context.VATs.AddRange(vats);
+                    logger.LogInformation("VAT entries added to the database.");
+
 
                     // Save changes
                     context.SaveChanges();

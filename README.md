@@ -19,13 +19,19 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 - **VAT Management**: Handle VAT for customer invoices.
 - **Database**: Built to work with SQL Server.
 
+
+![Description](https://i.imgur.com/uDmUb5U.png)
+
 ## Technologies Used
 
 - **Frontend**: Angular with NG-Zorro (Responsive UI components).
 - **Backend**: ASP.NET Core Web API 6.0 (Robust and scalable API layer).
 - **Database**: SQL Server (Code First Migration).
 
-## Getting Started
+![Description](https://i.imgur.com/0dwmGY1.png)
+
+
+## How to Install (without Docker)
 
 ### Prerequisites
 
@@ -68,7 +74,7 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 
 5. **Apply Migrations**:
    ```bash
-   dotnet ef database update --context ApplicationDbContext -- --provider SqlServer
+   dotnet ef database update
    ```
 
 ### Running the Application
@@ -83,16 +89,39 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
    dotnet run
    ```
 
-3. Open your browser and navigate to `http://localhost:4200` for the frontend.
+    3. Open your browser and navigate to `http://localhost:4200` for the frontend. Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
 
-## Usage
+4. To use SMTP with Outlook, you need to generate an app password if two-factor authentication (2FA) is enabled on your Microsoft account. Follow this [guide on how to get an app password](https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944) for detailed steps.
 
-- **Create Invoice**: Navigate to the "Invoices" section to generate new invoices.
-- **Manage Customers**: Add, edit, and manage customer details, including multiple shipping addresses.
-- **Email Invoices**: Email invoices directly to customers.
-- **Generate PDFs**: Export invoices as PDF documents.
-- **User Authentication**: Users can sign up, log in, and manage their profiles with role-based access control.
-- **Image Upload**: Upload profile pictures and invoice logos from the user profile settings or the invoice creation page.
+   
+   Make sure to replace the `"Password"` field in your `appsettings.js` with your generated app password.
+   In your `appsettings.js` file, use the following format to configure the SMTP server:
+
+```json
+{
+  Email": {
+    "SmtpServer": "smtp.office365.com",
+    "SmtpPort": 587,
+    "SenderEmail": "your-email@outlook-or-hotmail.com",
+    "SenderName": "Invoicika Team",
+    "SenderPassword": "your-app-password"
+  }
+}
+
+
+![Description](https://i.imgur.com/wrV0y1L.png)
+
+
+## How to Install (with Docker)
+ Make sure you have Docker Desktop installed. Then run
+   ```bash
+   docker-compose up
+   ```
+ You might see the seeder failed in docker compose log. To make the seeder happend, from your Docker Desktop, stop the backend container and run it again from Invoicika.
+Open your browser and navigate to `http://localhost:4444` for the frontend.
+ Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
+
+![Description](https://i.imgur.com/vNY5TTM.png)
 
 ## Contributing
 

@@ -21,6 +21,10 @@ namespace WebAPI.Controllers
             try
             {
                 var invoice = await _service.GetCustomerInvoiceByIdAsync(id);
+                if (invoice == null)
+                {
+                    return NotFound();
+                }
                 return Ok(invoice);
             }
             catch (KeyNotFoundException)
@@ -33,6 +37,10 @@ namespace WebAPI.Controllers
         public async Task<ActionResult<IEnumerable<CustomerInvoiceDto>>> GetAllCustomerInvoices()
         {
             var invoices = await _service.GetAllCustomerInvoicesAsync();
+            if (invoices == null)
+            {
+                return NotFound();
+            }
             return Ok(invoices);
         }
 
