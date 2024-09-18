@@ -5,6 +5,11 @@ using WebAPI.Data;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using QuestPDF.Helpers;
+using System.Globalization;
+using MailKit.Security;
+using MimeKit;
+using MailKit.Net.Smtp;
+
 
 namespace WebAPI.Services
 {
@@ -16,18 +21,19 @@ namespace WebAPI.Services
         Task<bool> UpdateCustomerInvoiceAsync(Guid id, CustomerInvoiceDto dto);
         Task DeleteCustomerInvoiceAsync(Guid id);
         Task<byte[]> GenerateInvoicePdfAsync(Guid invoiceId);
+        Task SendInvoiceEmailAsync(Guid invoiceId);
 
     }
 
     public class CustomerInvoiceService : ICustomerInvoiceService
     {
         private readonly InvoicikaDbContext _context;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public CustomerInvoiceService(InvoicikaDbContext context, IWebHostEnvironment environment)
+        public CustomerInvoiceService(InvoicikaDbContext context, IConfiguration configuration)
         {
             _context = context;
-            _environment = environment;
+            _configuration = configuration;
         }
 
         public async Task<CustomerInvoiceDto> GetCustomerInvoiceByIdAsync(Guid id)
@@ -138,32 +144,7 @@ namespace WebAPI.Services
                 throw;
             }
         }
-        /*
-        public async Task UpdateCustomerInvoiceAsync(Guid id, CustomerInvoiceDto dto)
-        {
-            var invoice = await _context.CustomerInvoices
-                .Include(c => c.CustomerInvoiceLines)
-                .FirstOrDefaultAsync(c => c.CustomerInvoiceId == id);
-
-            if (invoice == null) throw new KeyNotFoundException("Invoice not found");
-
-            invoice.Customer_id = dto.Customer_id;
-            invoice.User_id = dto.User_id;
-            invoice.InvoiceDate = dto.InvoiceDate;
-            invoice.CreationDate = dto.CreationDate;
-            invoice.UpdateDate = dto.UpdateDate;
-            invoice.SubTotalAmount = dto.SubTotalAmount;
-            invoice.VatAmount = dto.VatAmount;
-            invoice.TotalAmount = dto.TotalAmount;
-            invoice.Vat_id = dto.Vat_id;
-
-            // Update InvoiceLines if necessary
-            // This is simplified, you might need to handle existing lines and additions
-
-            _context.CustomerInvoices.Update(invoice);
-            await _context.SaveChangesAsync();
-        }
-        */
+        
         public async Task<bool> UpdateCustomerInvoiceAsync(Guid id, CustomerInvoiceDto updatedInvoice)
         {
             var existingInvoice = await _context.CustomerInvoices
@@ -211,7 +192,13 @@ namespace WebAPI.Services
 
         public async Task<byte[]> GenerateInvoicePdfAsync(Guid invoiceId)
         {
-            var invoice = await GetCustomerInvoiceByIdAsync(invoiceId);
+            var invoice = await _context.CustomerInvoices
+            .Include(c => c.Customer)  
+            .Include(c => c.User)      
+            .Include(c => c.VAT)       
+            .Include(c => c.CustomerInvoiceLines)
+            .ThenInclude(l => l.Item)
+            .FirstOrDefaultAsync(c => c.CustomerInvoiceId == invoiceId);
 
             if (invoice == null)
             {
@@ -228,11 +215,19 @@ namespace WebAPI.Services
 
             var customerInfo = new
             {
-                Name = invoice.Customer_id,  // Replace with actual values if available
-                Address = invoice.Customer_id, 
-                Phone = invoice.Customer_id    
+                Name = invoice.Customer.Name,
+                Address = invoice.Customer.Address,
+                Email = invoice.Customer.Email,
+                Phone = invoice.Customer.PhoneNumber
             };
 
+            var invoiceDetails = new
+            {
+                InvoiceNumber = invoice.CustomerInvoiceId.ToString(),
+                InvoiceDate = invoice.InvoiceDate.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture)
+            };
+
+            var vatPercentage = invoice.VAT.Percentage;
             // Calculations for subtotal, VAT, and total
             var subTotal = invoice.SubTotalAmount;
             var vat = subTotal * (invoice.VatAmount/100); 
@@ -263,22 +258,30 @@ namespace WebAPI.Services
                         {
                             row.RelativeItem().Column(columnLeft =>
                             {
-                                columnLeft.Item().Text("Company Info").Bold().FontSize(10);
+                                columnLeft.Item().Text("From").Bold().FontSize(10).FontColor(Colors.Blue.Darken2);
                                 columnLeft.Item().Text($"{companyInfo.CompanyName}").Bold().FontSize(12);
-                                columnLeft.Item().Text($"Address: {companyInfo.Address}");
-                                columnLeft.Item().Text($"Email: {companyInfo.Email}");
+                                columnLeft.Item().Text($"{companyInfo.Address}");
+                                columnLeft.Item().Text($"{companyInfo.Email}");
                                 foreach (var phone in companyInfo.PhoneNumbers)
                                 {
-                                    columnLeft.Item().Text($"Phone: {phone}");
+                                    columnLeft.Item().Text($"{phone}");
                                 }
                             });
 
                             row.RelativeItem().Column(columnRight =>
                             {
-                                columnRight.Item().Text("Customer Info").Bold().FontSize(10);
-                                columnRight.Item().Text($"Name: {customerInfo.Name}").Bold().FontSize(12);
-                                columnRight.Item().Text($"Address: {customerInfo.Address}");
-                                columnRight.Item().Text($"Phone: {customerInfo.Phone}");
+                                columnRight.Item().Text("To").Bold().FontSize(10).FontColor(Colors.Blue.Darken2);
+                                columnRight.Item().Text($"{customerInfo.Name}").Bold().FontSize(12);
+                                columnRight.Item().Text($"{customerInfo.Address}");
+                                columnRight.Item().Text($"{customerInfo.Email}");
+                                columnRight.Item().Text($"{customerInfo.Phone}");
+                            });
+
+                            row.RelativeItem().Column(columnRight =>
+                            {
+                                columnRight.Item().Text("Invoice Number").Bold().FontSize(10).FontColor(Colors.Blue.Darken2);
+                                columnRight.Item().PaddingBottom(5).Text($"{invoiceDetails.InvoiceNumber}").Bold().FontSize(9);
+                                columnRight.Item().Text($"{invoiceDetails.InvoiceDate}");
                             });
                         });
 
@@ -290,37 +293,37 @@ namespace WebAPI.Services
                             table.ColumnsDefinition(columns =>
                             {
                                 columns.ConstantColumn(100);  
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
+                                columns.RelativeColumn(180);
+                                columns.RelativeColumn(40);
+                                columns.RelativeColumn(60);
+                                columns.RelativeColumn(70);
                             });
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(CellStyle).Text("Product Name");
+                                header.Cell().Element(CellStyle).Text("Item Name");
                                 header.Cell().Element(CellStyle).Text("Description");
-                                header.Cell().Element(CellStyle).AlignRight().Text("Unit Price");
                                 header.Cell().Element(CellStyle).AlignRight().Text("Quantity");
+                                header.Cell().Element(CellStyle).AlignRight().Text("Unit Price");
                                 header.Cell().Element(CellStyle).AlignRight().Text("Total");
 
                                 static IContainer CellStyle(IContainer container)
                                 {
-                                    return container.DefaultTextStyle(x => x.Bold()).PaddingVertical(10).BorderBottom(1).BorderColor(Colors.Black).Background(Colors.Blue.Lighten2);
+                                    return container.DefaultTextStyle(x => x.Bold()).PaddingTop(10).Background(Colors.Blue.Lighten2);
                                 }
                             });
 
                             foreach (var line in invoice.CustomerInvoiceLines)
                             {
-                                table.Cell().Element(CellStyle).Text(line.ItemName);
-                                table.Cell().Element(CellStyle).Text(line.ItemDescription);
-                                table.Cell().Element(CellStyle).AlignRight().Text($"{line.Price}$");
-                                table.Cell().Element(CellStyle).AlignRight().Text(line.Quantity.ToString());
-                                table.Cell().Element(CellStyle).AlignRight().Text($"{line.Price * line.Quantity}$");
+                                table.Cell().Element(CellStyle).Text(line.Item.Name);
+                                table.Cell().Element(CellStyle).Text(line.Item.Description);
+                                table.Cell().Element(CellStyle).AlignRight().Text(line.Quantity.ToString("N0", CultureInfo.InvariantCulture));
+                                table.Cell().Element(CellStyle).AlignRight().Text($"{line.Price.ToString("F2", CultureInfo.InvariantCulture)}$");
+                                table.Cell().Element(CellStyle).AlignRight().Text($"{(line.Price * line.Quantity).ToString("F2", CultureInfo.InvariantCulture)}$");
 
                                 static IContainer CellStyle(IContainer container)
                                 {
-                                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(3);
+                                    return container.BorderBottom(1).BorderColor(Colors.Blue.Lighten2).PaddingVertical(3);
                                 }
                             }
                         });
@@ -331,21 +334,21 @@ namespace WebAPI.Services
                             // Define two columns: Labels and Values
                             table.ColumnsDefinition(columns =>
                             {
-                                columns.ConstantColumn(100);  
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
+                                columns.ConstantColumn(100);
+                                columns.RelativeColumn(180);
+                                columns.RelativeColumn(40);
+                                columns.RelativeColumn(60);
+                                columns.RelativeColumn(70);
                             });
 
-                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Subtotal:");
-                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{subTotal}$");
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Subtotal");
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{subTotal.ToString("F2", CultureInfo.InvariantCulture)}$");
 
-                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("VAT (5%):");
-                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{vat}$");
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text($"VAT ({vatPercentage}%)");
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{vat.ToString("F2", CultureInfo.InvariantCulture)}$");
 
-                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Total:").FontColor(Colors.Blue.Darken2).Bold().FontSize(10);
-                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{total}$").FontColor(Colors.Blue.Darken2).Bold().FontSize(10);
+                            table.Cell().ColumnSpan(4).Element(LabelCellStyle).Text("Grand Total").FontColor(Colors.Blue.Darken2).Bold().FontSize(12);
+                            table.Cell().Element(ValueCellStyle).AlignRight().Text($"{total.ToString("F2", CultureInfo.InvariantCulture)}$").FontColor(Colors.Blue.Darken2).Bold().FontSize(12);
 
                             static IContainer LabelCellStyle(IContainer container)
                             {
@@ -375,7 +378,77 @@ namespace WebAPI.Services
             }
         }
 
+        public async Task SendInvoiceEmailAsync(Guid invoiceId)
+        {
+            var invoiceDto = await GetCustomerInvoiceByIdAsync(invoiceId);
+
+            if (invoiceDto == null)
+            {
+                throw new Exception("Invoice not found.");
+            }
+
+            var customer = await _context.Customers.FindAsync(invoiceDto.Customer_id);
+
+            if (customer == null)
+            {
+                throw new Exception("Customer not found.");
+            }
+
+            var pdfBytes = await GenerateInvoicePdfAsync(invoiceId);
+
+            // Get email configuration from app settings
+            var smtpServer = _configuration["Email:SmtpServer"];
+            var smtpPort = int.Parse(_configuration["Email:SmtpPort"]);
+            var senderEmail = _configuration["Email:SenderEmail"];
+            var senderName = _configuration["Email:SenderName"];
+            var senderPassword = _configuration["Email:SenderPassword"];
+
+            // Create a new email message
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(senderName, senderEmail));
+            message.To.Add(new MailboxAddress("Recipient", customer.Email));
+            message.Subject = $"{customer.Name}, your Invoice from Invoicika";
+
+            // Create the email body with both text and HTML
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = "Please find the attached invoice.",
+                HtmlBody = $@"
+            <p>Dear {customer.Name},</p>
+            <p>Thank you for your recent transaction with Invoicika. Your invoice is attached to this email for your reference.</p>
+            <p>Best regards,</p>
+            <strong>Invoicika Team</strong>"
+            };
+
+            // Attach the PDF invoice
+            using (var stream = new MemoryStream(pdfBytes))
+            {
+                bodyBuilder.Attachments.Add($"invoice-{invoiceId}.pdf", stream.ToArray(), new ContentType("application", "pdf"));
+            }
+
+            // Set the email body content
+            message.Body = bodyBuilder.ToMessageBody();
+
+            // Send the email via SMTP
+            using (var client = new SmtpClient())
+            {
+                try
+                {
+                    await client.ConnectAsync(smtpServer, smtpPort, SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(senderEmail, senderPassword);
+
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error sending email: {ex.Message}");
+                }
+            }
+        }
+
+ 
+        }
 
     }
 
-}

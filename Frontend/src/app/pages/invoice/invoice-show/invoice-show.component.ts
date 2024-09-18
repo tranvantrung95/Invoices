@@ -5,6 +5,7 @@ import { CustomerInvoiceService } from 'src/app/services/customerinvoice.service
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { saveAs } from 'file-saver';
 import { VatService } from 'src/app/services/vat.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-invoice-show',
@@ -19,13 +20,15 @@ export class InvoiceShowComponent implements OnInit {
   subtotal = 0;
   vatAmount = 0;
   total = 0;
+  currentUser: any;
 
   constructor(
     private customerinvoiceService: CustomerInvoiceService,
     private customerService: CustomerService,
     private vatService: VatService,
     private route: ActivatedRoute,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -52,14 +55,20 @@ export class InvoiceShowComponent implements OnInit {
                   console.error('Error fetching customer:', error);
                 }
               );
-            this.vatService.getVatById(this.invoice.vat_id).subscribe(response => {
-              this.vat = response;
-            } , error => {  console.error('Error fetching vat:', error); }  );
+            this.vatService.getVatById(this.invoice.vat_id).subscribe(
+              (response) => {
+                this.vat = response;
+              },
+              (error) => {
+                console.error('Error fetching vat:', error);
+              }
+            );
           },
           (error) => {
             console.error('Error fetching invoice:', error);
           }
         );
+        this.currentUser = this.authService.getUserInfo().username;
     }
   }
 
@@ -76,12 +85,11 @@ export class InvoiceShowComponent implements OnInit {
           };
         }
       },
-      error => {
+      (error) => {
         console.error('Error fetching the PDF', error);
       }
     );
   }
-
 
   printInvoicePdf(invoiceId: string): void {
     this.customerinvoiceService.makePdfInvoice(invoiceId).subscribe(
@@ -94,14 +102,15 @@ export class InvoiceShowComponent implements OnInit {
     );
   }
 
-  emailInvoicePdf(invoiceId: string): void {
-    this.customerinvoiceService.emailInvoice(invoiceId).subscribe({
-      next: () => {
-        this.message.success('Invoice emailed successfully');
+  emailInvoicePdf(customerInvoiceId: string): void {
+    this.customerinvoiceService.emailInvoice(customerInvoiceId).subscribe({
+      next: (response) => {
+        this.message.success(response.message || 'Invoice emailed successfully');
       },
       error: (error) => {
-        this.message.error(`Error sending invoice: ${error}`);
+        this.message.error(`Error sending invoice: ${error.error?.error || 'Unknown error'}`);
       },
     });
   }
+
 }

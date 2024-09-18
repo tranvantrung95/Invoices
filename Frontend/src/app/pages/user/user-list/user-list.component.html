@@ -63,7 +63,7 @@
       <td>
         <ng-container *ngIf="user.photoUrl">
           <img
-            [src]="'https://localhost:5001' + user.photoUrl"
+            [src]="basePath + user.photoUrl"
             alt="Profile Photo"
             style="max-width: 50px; margin-top: 10px"
           />

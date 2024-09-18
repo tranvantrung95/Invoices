@@ -54,6 +54,7 @@
       <th nzColumnKey="customer_id" nzShowSort>Customer Name</th>
       <th nzColumnKey="invoiceDate" nzShowSort>Invoice Date</th>
       <th nzColumnKey="totalAmount" nzShowSort>Total Amount</th>
+      <th nzColumnKey="totalAmount" nzShowSort>By</th>
       <th nzColumnKey="actions">Actions</th>
     </tr>
   </thead>
@@ -63,6 +64,7 @@
       <td>{{ getCustomerName(invoice.customer_id) }}</td>
       <td>{{ invoice.invoiceDate | date }}</td>
       <td>{{ invoice.totalAmount | currency }}</td>
+      <td>{{ getUserName(invoice.user_id)}}</td>
       <td>
         <a [routerLink]="['/invoices/show', invoice.customerInvoiceId]">
           <span

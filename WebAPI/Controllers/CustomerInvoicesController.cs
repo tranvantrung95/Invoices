@@ -100,6 +100,20 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPost("email/{invoiceId}")]
+        public async Task<IActionResult> SendInvoiceEmail(Guid invoiceId)
+        {
+            try
+            {
+                await _service.SendInvoiceEmailAsync(invoiceId);
+                return Ok(new { message = "Email sent successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+
     }
 
 }

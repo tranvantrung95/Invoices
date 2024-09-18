@@ -4,6 +4,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { Router } from '@angular/router';
 import { RoleService } from 'src/app/services/role.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-user-list',
@@ -16,17 +17,22 @@ export class UserListComponent implements OnInit {
   pageSize = 10;
   pageIndex = 1;
   total = 0;
+  basePath: string;
+
 
   constructor(
     private userService: UserService,
     private roleService: RoleService,
     private message: NzMessageService,
     private router: Router,
-    private modal: NzModalService
-  ) {}
+    private modal: NzModalService,
+  ) {
+    this.basePath = environment.apiUrl.replace('/api/', '');
+  }
 
   ngOnInit(): void {
     this.loadDataFromServer(this.pageIndex, this.pageSize, null, null, []);
+
   }
 
   loadDataFromServer(
@@ -85,4 +91,5 @@ export class UserListComponent implements OnInit {
   onBack(): void {
     this.router.navigate(['/dashboard']);
   }
+
 }

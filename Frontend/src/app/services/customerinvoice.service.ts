@@ -74,11 +74,7 @@ export class CustomerInvoiceService {
   getItems(): Observable<any[]> {
     return this.http.get<any[]>(this.itemsUrl).pipe(catchError(() => of([])));
   }
-  /*
-  makePdfInvoice(customerInvoiceId: string): Observable<any> {
-    return this.http.get<void>(`${this.apiUrl}/pdf/${customerInvoiceId}`);
-  }
-    */
+  
   makePdfInvoice(customerInvoiceId: string) {
     const url = `${this.apiUrl}/pdf/${customerInvoiceId}`;
     return this.http.get(url, { responseType: 'blob' });

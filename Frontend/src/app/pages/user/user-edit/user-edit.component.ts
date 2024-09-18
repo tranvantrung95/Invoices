@@ -9,6 +9,7 @@ import {
 import { UserService } from 'src/app/services/user.service';
 import { RoleService } from 'src/app/services/role.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-user-edit',
@@ -23,7 +24,7 @@ export class UserEditComponent implements OnInit {
   selectedFilePreview: File | null = null;
   photoUrl: string | null = null;
   loading = true;
-
+  basePath: string;
   constructor(
     private fb: NonNullableFormBuilder,
     private userService: UserService,
@@ -42,6 +43,7 @@ export class UserEditComponent implements OnInit {
       photoUrl: new FormControl<string | null>(null),
       passwordHash: new FormControl<string | null>(null),
     });
+    this.basePath = environment.apiUrl.replace('/api/', '');
   }
 
   ngOnInit(): void {

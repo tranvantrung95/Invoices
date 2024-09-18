@@ -1,3 +1,4 @@
+import { AuthService } from './../../../services/auth.service';
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -21,6 +22,7 @@ export class InvoiceEditComponent implements OnInit {
   vatAmount = 0;
   totalAmount = 0;
   invoiceId: string = '';
+  currentUser: any;
   loading = true;
 
   constructor(
@@ -28,7 +30,8 @@ export class InvoiceEditComponent implements OnInit {
     private invoiceService: CustomerInvoiceService,
     private router: Router,
     private route: ActivatedRoute,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private authservice: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +54,7 @@ export class InvoiceEditComponent implements OnInit {
     this.loadVats();
     this.loadItems();
     this.loadInvoiceData();
+    this.currentUser = this.authservice.getUserInfo().username;
   }
 
   loadCustomers() {
@@ -88,7 +92,7 @@ export class InvoiceEditComponent implements OnInit {
         .subscribe((invoice: any) => {
           this.validateForm.patchValue({
             customerId: invoice.customer_id,
-            userId: invoice.user_id,
+            userId: this.authservice.getUserInfo().userId,
             invoiceDate: invoice.invoiceDate,
             vatId: invoice.vat_id,
             subTotal: invoice.subTotalAmount,
@@ -211,6 +215,11 @@ export class InvoiceEditComponent implements OnInit {
     }
   }
 
+  getUserName(userId: string): string {
+    const user = this.usersList.find((u) => u.userId === userId);
+    return user ? user.username : 'Unknown';
+  }
+
   onBack(): void {
     this.router.navigate(['/invoices/all']);
   }
@@ -245,13 +254,17 @@ export class InvoiceEditComponent implements OnInit {
     );
   }
 
-  emailInvoicePdf(invoiceId: string): void {
-    this.invoiceService.emailInvoice(invoiceId).subscribe({
-      next: () => {
-        this.message.success('Invoice emailed successfully');
+  emailInvoicePdf(customerInvoiceId: string): void {
+    this.invoiceService.emailInvoice(customerInvoiceId).subscribe({
+      next: (response) => {
+        this.message.success(
+          response.message || 'Invoice emailed successfully'
+        );
       },
       error: (error) => {
-        this.message.error(`Error sending invoice: ${error}`);
+        this.message.error(
+          `Error sending invoice: ${error.error?.error || 'Unknown error'}`
+        );
       },
     });
   }

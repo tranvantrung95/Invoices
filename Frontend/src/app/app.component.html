@@ -44,7 +44,7 @@
           <li nz-menu-item nzMatchRouter>
             <a routerLink="/vat/all">VAT</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
+          <li *ngIf="role === 'Admin'" nz-menu-item nzMatchRouter>
             <a routerLink="/users/all">Users</a>
           </li>
           <li nz-menu-item nzMatchRouter>
@@ -72,7 +72,7 @@
           </a>
           <nz-dropdown-menu #menu="nzDropdownMenu">
             <ul nz-menu nzSelectable>
-              <li nz-menu-item [routerLink]="['/users/edit', userId]">Profile</li>
+              <li nz-menu-item *ngIf="userId" [routerLink]="['/users/edit', userId]">Profile</li>
               <li nz-menu-item (click)="authService.logout()">Logout</li>
             </ul>
           </nz-dropdown-menu>

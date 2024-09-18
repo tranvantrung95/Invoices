@@ -4,7 +4,7 @@
   <div class="form-row">
     <nz-row [nzGutter]="16" class="header">
       <!-- Company Info Section -->
-      <nz-col nzSpan="8">
+      <nz-col nzSpan="5">
     <nz-form-item>
       <nz-form-label nzFor="customerId">Customer</nz-form-label>
       <nz-form-control>
@@ -17,25 +17,8 @@
         </nz-select>
       </nz-form-control>
     </nz-form-item>
-
   </nz-col>
-
-  <!-- User Section -->
-  <nz-col nzSpan="8">
-    <nz-form-item>
-      <nz-form-label nzFor="userId">User</nz-form-label>
-      <nz-form-control>
-        <nz-select formControlName="userId" nzPlaceHolder="Select User">
-          <nz-option
-            *ngFor="let user of usersList"
-            [nzValue]="user.userId"
-            [nzLabel]="user.username"
-          ></nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
-  </nz-col>
-
+  <nz-col nzSpan="1"></nz-col>
   <!-- Date Info Section -->
   <nz-col nzSpan="8">
     <nz-form-item>

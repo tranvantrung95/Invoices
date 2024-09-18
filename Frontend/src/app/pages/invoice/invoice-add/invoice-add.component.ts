@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { AuthService } from 'src/app/services/auth.service';
 import { CustomerInvoiceService } from 'src/app/services/customerinvoice.service';
 
 @Component({
@@ -19,18 +20,19 @@ export class InvoiceAddComponent implements OnInit {
   subTotalAmount = 0;
   vatAmount = 0;
   totalAmount = 0;
+  userId: any;
 
   constructor(
     private fb: FormBuilder,
     private invoiceService: CustomerInvoiceService,
     private router: Router,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
       customerId: [null, [Validators.required]],
-      userId: [null, [Validators.required]],
       invoiceDate: [null, [Validators.required]],
       vatId: [null],
       subTotal: [0],
@@ -44,6 +46,7 @@ export class InvoiceAddComponent implements OnInit {
     this.loadVats();
     this.loadItems();
     this.addLineItem();
+    this.userId = this.auth.getUserInfo().userId;
   }
 
   loadCustomers() {
@@ -139,7 +142,7 @@ export class InvoiceAddComponent implements OnInit {
       const formValue = this.validateForm.value;
       const payload = {
         customer_id: formValue.customerId,
-        user_id: formValue.userId,
+        user_id: this.userId,
         invoiceDate: formValue.invoiceDate,
         vat_id: formValue.vatId,
         subTotalAmount: parseFloat(formValue.subTotal),

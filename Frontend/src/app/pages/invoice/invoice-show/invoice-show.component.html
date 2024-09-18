@@ -12,10 +12,10 @@
     <!-- Company Info Section -->
     <nz-col nzSpan="8">
       <div class="company-info">
-        <p><strong>Company Name</strong></p>
-        <p>1234 Street Address, City</p>
+        <p><strong>Invoicika Inc.</strong></p>
+        <p>456 Business Road, Metropolis</p>
         <p>Phone: (123) 456-7890</p>
-        <p>Email: info at deux.com</p>
+        <p>Email: info@invoicika.com</p>
       </div>
     </nz-col>
 
@@ -34,6 +34,7 @@
       <div class="date-info">
         <p><strong>Invoice No: {{ invoice.customerInvoiceId }}</strong></p>
         <p>Date: {{ invoice.invoiceDate | date }}</p>
+        <p>By: {{currentUser}}</p>
       </div>
     </nz-col>
   </nz-row>

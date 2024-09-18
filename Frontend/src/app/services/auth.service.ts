@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class AuthService {
   private apiUrl = environment.apiUrl + 'auth';
+  userInfoUpdated = new EventEmitter<void>();
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -21,6 +22,7 @@ export class AuthService {
         tap((response) => {
           if (response && response.token) {
             localStorage.setItem('token', response.token);
+            this.userInfoUpdated.emit();
           }
         })
       );
@@ -68,5 +70,9 @@ export class AuthService {
       userId: null,
       role: null,
     };
+  }
+
+  private refreshUserInfo(): void {
+    const userInfo = this.getUserInfo();
   }
 }

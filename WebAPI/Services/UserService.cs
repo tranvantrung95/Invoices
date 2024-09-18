@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Dtos;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace WebAPI.Services
 {
@@ -76,9 +78,9 @@ namespace WebAPI.Services
             user.UpdateDate = DateTime.UtcNow;
 
             // Update PasswordHash only if provided
-            if (!string.IsNullOrEmpty(userDto.PasswordHash))
+            if (!string.IsNullOrEmpty(userDto.PasswordHash) && userDto.PasswordHash != "null")
             {
-                user.PasswordHash = userDto.PasswordHash;
+                user.PasswordHash = HashPassword(userDto.PasswordHash);
             }
 
             // Save changes
@@ -103,6 +105,14 @@ namespace WebAPI.Services
         {
             return await _context.Users
                 .AnyAsync(u => u.Username == username && (!excludeUserId.HasValue || u.UserId != excludeUserId.Value));
+        }
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(bytes);
+            }
         }
     }
 }
