@@ -1,5 +1,3 @@
-
-
 ![Invoicika](https://i.imgur.com/8AF7yiL.png)
 
 # **Invoicika**
@@ -19,7 +17,6 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 - **VAT Management**: Handle VAT for customer invoices.
 - **Database**: Built to work with SQL Server.
 
-
 ![Description](https://i.imgur.com/uDmUb5U.png)
 
 ## Technologies Used
@@ -29,7 +26,6 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 - **Database**: SQL Server (Code First Migration).
 
 ![Description](https://i.imgur.com/0dwmGY1.png)
-
 
 ## How to Install (without Docker)
 
@@ -42,12 +38,14 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/codebangla/invoicika.git
    cd invoicika
    ```
 
 2. **Frontend (Angular)**:
+
    ```bash
    cd frontend
    npm install
@@ -55,6 +53,7 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
    ```
 
 3. **Backend (ASP.NET Core)**:
+
    ```bash
    cd backend
    dotnet restore
@@ -64,8 +63,9 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 
    - Ensure SQL Server is installed and running.
    - Update the connection strings in `appsettings.json` to configure your SQL Server database.
-   
+
      Example:
+
      ```json
      "ConnectionStrings": {
        "SqlServerConnection": "Your SQL Server connection string"
@@ -80,20 +80,21 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
 ### Running the Application
 
 1. Run the **Angular frontend**:
+
    ```bash
    ng serve
    ```
 
 2. Run the **ASP.NET Core backend**:
+
    ```bash
    dotnet run
    ```
 
-    3. Open your browser and navigate to `http://localhost:4200` for the frontend. Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
+   3. Open your browser and navigate to `http://localhost:4200` for the frontend. Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
 
-4. To use SMTP with Outlook, you need to generate an app password if two-factor authentication (2FA) is enabled on your Microsoft account. Follow this [guide on how to get an app password](https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944) for detailed steps.
+3. To use SMTP with Outlook, you need to generate an app password if two-factor authentication (2FA) is enabled on your Microsoft account. Follow this [guide on how to get an app password](https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944) for detailed steps.
 
-   
    Make sure to replace the `"Password"` field in your `appsettings.js` with your generated app password.
    In your `appsettings.js` file, use the following format to configure the SMTP server:
 
@@ -107,19 +108,21 @@ Invoicika is an advanced invoice management system built with Angular 16, ASP.NE
     "SenderPassword": "your-app-password"
   }
 }
-
+```
 
 ![Description](https://i.imgur.com/wrV0y1L.png)
 
-
 ## How to Install (with Docker)
- Make sure you have Docker Desktop installed. Then run
-   ```bash
-   docker-compose up
-   ```
- You might see the seeder failed in docker compose log. To make the seeder happend, from your Docker Desktop, stop the backend container and run it again from Invoicika.
+
+Make sure you have Docker Desktop installed. Then run
+
+```bash
+docker-compose up
+```
+
+You might see the seeder failed in docker compose log. To make the seeder happend, from your Docker Desktop, stop the backend container and run it again from Invoicika.
 Open your browser and navigate to `http://localhost:4444` for the frontend.
- Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
+Login with `username: admin1, password: admin1` as admin or `username: employee1, password: employee1` as employee. The backend is at `http://localhost:5000/swagger/index.html`
 
 ![Description](https://i.imgur.com/vNY5TTM.png)
 
