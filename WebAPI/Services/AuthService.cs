@@ -21,11 +21,14 @@ namespace WebAPI.Services
         private readonly InvoicikaDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly string _employeeRoleName = "Employee";
+        private readonly TokenService _tokenService; // Sử dụng TokenService
 
-        public AuthService(InvoicikaDbContext context, IConfiguration configuration)
+
+        public AuthService(InvoicikaDbContext context, IConfiguration configuration, TokenService tokenService)
         {
             _context = context;
             _configuration = configuration;
+            _tokenService = tokenService;  // Lấy khóa từ TokenService
         }
 
         public async Task<User> SignupAsync(SignupDto signupDto)
@@ -90,7 +93,7 @@ namespace WebAPI.Services
 
         private string GenerateJwtToken(User user)
         {
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+           // var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -100,10 +103,13 @@ namespace WebAPI.Services
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Role, user.Role.RoleName)
         }),
-                Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"])),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                //Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"])),
+                //Issuer = _configuration["Jwt:Issuer"],
+                //Audience = _configuration["Jwt:Audience"],
+                //SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(_tokenService.GetRsaSecurityKey(), SecurityAlgorithms.RsaSha256)  // Sử dụng RSA để ký token
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

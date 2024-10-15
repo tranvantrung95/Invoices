@@ -2,9 +2,11 @@
 using WebAPI.Dtos;
 using WebAPI.Models;
 using WebAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    [Authorize] // Thêm thuộc tính này để yêu cầu xác thực
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
