@@ -24,6 +24,9 @@ export class AuthService {
             localStorage.setItem('token', response.token);
             this.userInfoUpdated.emit();
           }
+          else {
+          localStorage.removeItem('token');  // Nếu không có token hợp lệ, xóa token
+        }
         })
       );
   }
